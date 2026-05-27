@@ -1,6 +1,8 @@
+import Link from "next/link";
+import { BookOpen, CalendarDays, ChevronLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { formatDateAr } from "@/lib/utils";
-import type { BlogPost, BlogContent } from "@/types/database";
+import type { BlogPost } from "@/types/database";
 
 interface BlogViewProps {
   posts: BlogPost[];
@@ -9,140 +11,58 @@ interface BlogViewProps {
 export function BlogView({ posts }: BlogViewProps) {
   if (posts.length === 0) {
     return (
-      <Card>
-        <p className="text-slate-500">لا توجد مقالات منشورة بعد.</p>
+      <Card className="text-center py-12">
+        <BookOpen className="mx-auto h-10 w-10 text-muted mb-3" />
+        <p className="text-muted text-sm">لا توجد مقالات منشورة بعد.</p>
       </Card>
     );
   }
 
-  const featured = posts[0];
-  const rest = posts.slice(1);
-
   return (
-    <div className="space-y-8">
-      {featured ? <BlogHero post={featured} /> : null}
-
-      <div className="grid gap-6 sm:grid-cols-2">
-        {rest.map((post) => (
-          <BlogCard key={post.id} post={post} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function BlogHero({ post }: { post: BlogPost }) {
-  const content = post.content as BlogContent;
-
-  return (
-    <section
-      className="overflow-hidden rounded-2xl bg-gradient-to-l from-emerald-700 to-emerald-500 p-8 text-white shadow-lg"
-      aria-labelledby="blog-hero-title"
-    >
-      <p className="text-sm text-emerald-100">نبض الطيبات — مدونة تعليمية</p>
-      <h1 id="blog-hero-title" className="mt-2 text-3xl font-bold">
-        {post.title}
-      </h1>
-      {post.excerpt ? <p className="mt-3 max-w-2xl text-emerald-50">{post.excerpt}</p> : null}
-      {post.published_at ? (
-        <p className="mt-4 text-xs text-emerald-200">
-          {formatDateAr(new Date(post.published_at), { dateStyle: "long" })}
-        </p>
-      ) : null}
-      <BlogContentBlocks content={content} light />
-    </section>
-  );
-}
-
-function BlogCard({ post }: { post: BlogPost }) {
-  return (
-    <Card>
-      <h2 className="text-lg font-bold">{post.title}</h2>
-      {post.excerpt ? <p className="mt-2 text-sm text-slate-600">{post.excerpt}</p> : null}
-      <BlogContentBlocks content={post.content as BlogContent} />
-    </Card>
-  );
-}
-
-function BlogContentBlocks({
-  content,
-  light = false,
-}: {
-  content: BlogContent;
-  light?: boolean;
-}) {
-  return (
-    <div className={`mt-4 space-y-4 ${light ? "text-emerald-50" : ""}`}>
-      {content.sections?.map((s, i) => (
-        <div key={i}>
-          {s.title ? <h3 className="font-semibold">{s.title}</h3> : null}
-          {s.body ? <p className="text-sm">{s.body}</p> : null}
-          {s.items ? (
-            <ul className="mr-4 list-disc text-sm">
-              {s.items.map((item, j) => (
-                <li key={j}>{item}</li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
+    <div className="space-y-4">
+      {posts.map((post, i) => (
+        <Link key={post.id} href={`/blog/${post.slug}`}>
+          <Card
+            className={`p-5 hover:shadow-elevated transition-all duration-200 active:scale-[0.99] group ${
+              i === 0 ? "gradient-primary text-white" : "bg-white dark:bg-slate-800"
+            }`}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 text-xs mb-1.5">
+                  <CalendarDays className="h-3.5 w-3.5" />
+                  {post.published_at ? (
+                    <span className={i === 0 ? "text-white/70" : "text-muted"}>
+                      {formatDateAr(new Date(post.published_at), {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
+                  ) : null}
+                </div>
+                <h2 className={`text-lg font-bold leading-snug ${i === 0 ? "text-white" : "text-slate-900 dark:text-white"}`}>
+                  {post.title}
+                </h2>
+                {post.excerpt ? (
+                  <p className={`mt-1.5 text-sm leading-relaxed line-clamp-2 ${i === 0 ? "text-white/80" : "text-muted"}`}>
+                    {post.excerpt}
+                  </p>
+                ) : null}
+              </div>
+              <div
+                className={`shrink-0 flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200 ${
+                  i === 0
+                    ? "bg-white/20 text-white group-hover:bg-white/30"
+                    : "bg-slate-100 text-slate-400 group-hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-500 dark:group-hover:bg-slate-600"
+                }`}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </div>
+            </div>
+          </Card>
+        </Link>
       ))}
-
-      {content.allowedTable && content.allowedTable.length > 0 ? (
-        <RulesTable title="مسموح" rows={content.allowedTable} variant="allowed" light={light} />
-      ) : null}
-
-      {content.prohibitedTable && content.prohibitedTable.length > 0 ? (
-        <RulesTable title="ممنوع" rows={content.prohibitedTable} variant="prohibited" light={light} />
-      ) : null}
-
-      {content.intervalChart && content.intervalChart.length > 0 ? (
-        <div>
-          <h3 className="font-semibold">فترات الوجبات</h3>
-          <ul className="mt-2 space-y-1 text-sm">
-            {content.intervalChart.map((row, i) => (
-              <li key={i}>
-                {row.label}: {row.hours} ساعة
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function RulesTable({
-  title,
-  rows,
-  variant,
-  light,
-}: {
-  title: string;
-  rows: Array<{ category: string; items: string }>;
-  variant: "allowed" | "prohibited";
-  light?: boolean;
-}) {
-  const border = variant === "allowed" ? "border-emerald-400" : "border-red-400";
-
-  return (
-    <div className="overflow-x-auto">
-      <h3 className="mb-2 font-semibold">{title}</h3>
-      <table className={`w-full text-sm ${light ? "text-white" : ""}`}>
-        <thead>
-          <tr className={light ? "border-b border-emerald-400/50" : "border-b"}>
-            <th className="py-2 text-right">الفئة</th>
-            <th className="py-2 text-right">أمثلة</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, i) => (
-            <tr key={i} className={`border-b ${border}/30`}>
-              <td className="py-2 font-medium">{row.category}</td>
-              <td className="py-2">{row.items}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 }
