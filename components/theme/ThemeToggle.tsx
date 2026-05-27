@@ -27,11 +27,12 @@ export function ThemeToggle() {
       size="sm"
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label={isDark ? "التبديل إلى الوضع النهاري" : "التبديل إلى الوضع الليلي"}
+      className="rounded-xl"
     >
       {isDark ? (
-        <Sun className="h-5 w-5" aria-hidden="true" />
+        <Sun className="h-5 w-5 text-amber-400" aria-hidden="true" />
       ) : (
-        <Moon className="h-5 w-5" aria-hidden="true" />
+        <Moon className="h-5 w-5 text-primary" aria-hidden="true" />
       )}
     </Button>
   );

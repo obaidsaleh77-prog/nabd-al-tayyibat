@@ -3,22 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --color-emerald-from: #059669;
-  --color-emerald-to: #10b981;
-  --color-gold: #f59e0b;
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --color-primary: #6C5CE7;
+  --color-secondary: #00CEC9;
+  --background: #F8F9FA;
+  --foreground: #2D3436;
   --card: #ffffff;
-  --border: #e2e8f0;
-  --muted: #64748b;
+  --border: #E9ECEF;
+  --muted: #95A5A6;
 }
 
 .dark {
-  --background: #0f172a;
-  --foreground: #f1f5f9;
-  --card: #1e293b;
+  --background: #0F172A;
+  --foreground: #F1F5F9;
+  --card: #1E293B;
   --border: #334155;
-  --muted: #94a3b8;
+  --muted: #94A3B8;
 }
 
 html {
@@ -26,17 +25,15 @@ html {
 }
 
 body {
-  @apply font-arabic antialiased;
+  @apply antialiased;
   background-color: var(--background);
   color: var(--foreground);
 }
 
-/* تحسين إمكانية الوصول: focus واضح */
 :focus-visible {
-  @apply outline-2 outline-offset-2 outline-emerald-600;
+  @apply outline-2 outline-offset-2 outline-primary;
 }
 
-/* تقليل الحركة عند طلب المستخدم */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -44,5 +41,14 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@layer components {
+  .card-gradient {
+    background: linear-gradient(135deg, #6C5CE7, #00CEC9);
+  }
+  .card-gradient-secondary {
+    background: linear-gradient(135deg, #00CEC9, #6C5CE7);
   }
 }

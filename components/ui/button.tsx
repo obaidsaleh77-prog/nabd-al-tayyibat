@@ -11,10 +11,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
   primary:
-    "bg-gradient-to-l from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600 shadow-md",
+    "bg-gradient-to-l from-primary-dark to-primary text-white hover:opacity-90 shadow-md",
   secondary: "bg-slate-200 text-slate-900 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-100",
   outline:
-    "border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950",
+    "border-2 border-primary text-primary hover:bg-primary/5 dark:text-primary-light dark:border-primary-light",
   ghost: "hover:bg-slate-100 dark:hover:bg-slate-800",
   danger: "bg-red-600 text-white hover:bg-red-700",
 };
@@ -45,8 +45,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled ?? isLoading}
         aria-busy={isLoading}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors",
-          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600",
+          "inline-flex items-center justify-center gap-2 rounded-2xl font-medium transition-all",
+          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
           "disabled:pointer-events-none disabled:opacity-50",
           variantClasses[variant],
           sizeClasses[size],

@@ -4,19 +4,12 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export interface AppLogoProps {
-  /** عرض الشعار بالبكسل */
   size?: number;
-  /** إظهار النص بجانب الشعار */
   showText?: boolean;
   className?: string;
-  /** معرّف للوصولية */
   title?: string;
 }
 
-/**
- * شعار نبض الطيبات — حرف «ن» هندسي مع خط نبض ECG
- * ألوان: زمردي (#059669 → #10B981) + لمسة ذهبية (#F59E0B)
- */
 export function AppLogo({
   size = 48,
   showText = true,
@@ -42,34 +35,31 @@ export function AppLogo({
         className="shrink-0"
       >
         <defs>
-          <linearGradient id="logo-emerald" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#059669" />
-            <stop offset="100%" stopColor="#10B981" />
+          <linearGradient id="logo-primary" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#5A4BD1" />
+            <stop offset="100%" stopColor="#6C5CE7" />
           </linearGradient>
-          <linearGradient id="logo-gold" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#F59E0B" />
-            <stop offset="100%" stopColor="#FBBF24" />
+          <linearGradient id="logo-secondary" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#00CEC9" />
+            <stop offset="100%" stopColor="#55E6C1" />
           </linearGradient>
         </defs>
 
-        {/* خلفية دائرية خفيفة */}
         <circle
           cx="32"
           cy="32"
           r="30"
-          className="fill-emerald-50 dark:fill-emerald-950/40"
+          className="fill-primary/5 dark:fill-primary/10"
         />
 
-        {/* حرف «ن» هندسي */}
         <path
           d="M18 44V20h6l10 16V20h6v24h-6L24 28v16h-6z"
-          fill="url(#logo-emerald)"
+          fill="url(#logo-primary)"
         />
 
-        {/* خط النبض ECG — يمر عبر الحرف */}
         <motion.path
           d="M8 32h10l4-8 4 16 4-12 4 8h18"
-          stroke="url(#logo-gold)"
+          stroke="url(#logo-secondary)"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -85,12 +75,11 @@ export function AppLogo({
           }}
         />
 
-        {/* نقطة نبض */}
         <motion.circle
           cx="52"
           cy="32"
           r="3"
-          fill="#F59E0B"
+          fill="#00CEC9"
           animate={{ scale: [1, 1.3, 1], opacity: [0.8, 1, 0.8] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -98,7 +87,7 @@ export function AppLogo({
 
       {showText ? (
         <div className="flex flex-col leading-tight">
-          <span className="bg-gradient-to-l from-emerald-700 to-emerald-500 bg-clip-text text-lg font-bold text-transparent dark:from-emerald-400 dark:to-emerald-300">
+          <span className="bg-gradient-to-l from-[#5A4BD1] to-[#6C5CE7] bg-clip-text text-lg font-bold text-transparent dark:from-[#8B7CF7] dark:to-[#6C5CE7]">
             نبض
           </span>
           <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -110,7 +99,6 @@ export function AppLogo({
   );
 }
 
-/** نسخة SVG قابلة للتصدير (بدون نص) */
 export function AppLogoMark({ size = 64 }: { size?: number }) {
   return <AppLogo size={size} showText={false} title="شعار نبض الطيبات" />;
 }
