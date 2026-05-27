@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { Settings, Shield, User } from "lucide-react";
 import { getHealthProfile } from "@/app/actions/profile";
 import { HealthProfileForm } from "@/components/forms/HealthProfileForm";
 import { SettingsActions } from "@/components/forms/SettingsActions";
@@ -25,25 +26,39 @@ export default async function SettingsPage() {
     .maybeSingle();
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-bold">الإعدادات</h1>
-
-      <HealthProfileForm profile={profile as UserHealthProfile | null} />
+    <div className="mx-auto max-w-2xl space-y-5 animate-fade-in">
+      <div>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white">الإعدادات</h1>
+        <p className="text-sm text-muted">إدارة ملفك الصحي والخصوصية</p>
+      </div>
 
       <Card>
-        <h2 className="mb-2 text-lg font-bold">الخصوصية والموافقة</h2>
-        <p className="mb-4 text-sm text-slate-600 dark:text-slate-400">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <User className="h-4 w-4" />
+          </div>
+          <h2 className="text-base font-bold text-slate-800 dark:text-white">الملف الصحي</h2>
+        </div>
+        <HealthProfileForm profile={profile as UserHealthProfile | null} />
+      </Card>
+
+      <Card>
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-500">
+            <Shield className="h-4 w-4" />
+          </div>
+          <h2 className="text-base font-bold text-slate-800 dark:text-white">الخصوصية والموافقة</h2>
+        </div>
+        <p className="mb-3 text-sm text-muted">
           إصدار الإقرار الحالي: {DISCLAIMER_VERSION}
           {consent?.consented_at
             ? ` — آخر موافقة: ${new Date(consent.consented_at).toLocaleDateString("ar-SA")}`
             : null}
         </p>
-        <div className="prose prose-sm mb-4 text-slate-600 dark:prose-invert">
-          <p>
-            نحفظ بياناتك بشكل آمن وفق سياسة RLS. لا نشارك بياناتك الصحية مع أطراف
-            ثالثة. البيانات مشفرة أثناء النقل (HTTPS).
-          </p>
-        </div>
+        <p className="mb-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+          نحفظ بياناتك بشكل آمن وفق سياسة RLS. لا نشارك بياناتك الصحية مع أطراف ثالثة.
+          البيانات مشفرة أثناء النقل (HTTPS).
+        </p>
         <SettingsActions />
       </Card>
     </div>

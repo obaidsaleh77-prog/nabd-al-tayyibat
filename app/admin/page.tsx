@@ -4,7 +4,7 @@ import { getAdminStats } from "@/app/actions/admin";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatNumberAr } from "@/lib/utils";
-import { RefreshCw, Users, Utensils, ClipboardList, TrendingUp, Settings, BookOpen } from "lucide-react";
+import { RefreshCw, Users, Utensils, ClipboardList, TrendingUp, Settings, BookOpen, ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = { title: "لوحة الأدمن" };
 
@@ -12,35 +12,47 @@ export default async function AdminPage() {
   const stats = await getAdminStats();
 
   if (!stats) {
-    return <p className="p-8 text-red-600">غير مصرح</p>;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-red-500">غير مصرح بالوصول</p>
+      </div>
+    );
   }
 
   const statCards = [
-    { label: "المستخدمون", value: stats.usersCount, icon: Users, color: "text-primary bg-primary/10" },
-    { label: "الوجبات المسجّلة", value: stats.mealsCount, icon: Utensils, color: "text-secondary bg-secondary/10" },
-    { label: "قواعد المرجع الغذائي", value: stats.foodRulesCount, icon: ClipboardList, color: "text-emerald-600 bg-emerald-50" },
-    { label: "أحداث تحليلية", value: stats.eventsCount, icon: TrendingUp, color: "text-amber-600 bg-amber-50" },
+    { label: "المستخدمون", value: stats.usersCount, icon: Users, color: "bg-primary/10 text-primary" },
+    { label: "الوجبات", value: stats.mealsCount, icon: Utensils, color: "bg-secondary/10 text-secondary" },
+    { label: "القواعد", value: stats.foodRulesCount, icon: ClipboardList, color: "bg-emerald-50 text-emerald-600" },
+    { label: "الأحداث", value: stats.eventsCount, icon: TrendingUp, color: "bg-amber-50 text-amber-600" },
   ];
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8 p-6">
-      <div>
-        <h1 className="text-2xl font-bold text-text-dark dark:text-white">لوحة الإدارة</h1>
-        <p className="text-sm text-text-light dark:text-slate-400">مرحباً بعودتك، إليك ملخص التطبيق</p>
+    <div className="mx-auto max-w-5xl space-y-6 p-5 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">لوحة الإدارة</h1>
+          <p className="text-sm text-muted">ملخص التطبيق وإعدادات النظام</p>
+        </div>
+        <Link href="/">
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="h-4 w-4" />
+            العودة
+          </Button>
+        </Link>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {statCards.map((s) => {
           const Icon = s.icon;
           return (
-            <Card key={s.label} className="border-0 bg-white dark:bg-slate-800 shadow-card dark:shadow-card-dark">
+            <Card key={s.label} className="p-4">
               <div className="flex items-center gap-3">
-                <div className={`rounded-2xl p-3 ${s.color}`}>
-                  <Icon className="h-6 w-6" />
+                <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${s.color}`}>
+                  <Icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-xs text-text-light dark:text-slate-400">{s.label}</p>
-                  <p className="text-2xl font-bold text-text-dark dark:text-white">{formatNumberAr(s.value)}</p>
+                  <p className="text-xs text-muted">{s.label}</p>
+                  <p className="text-xl font-bold text-slate-900 dark:text-white">{formatNumberAr(s.value)}</p>
                 </div>
               </div>
             </Card>
@@ -48,35 +60,30 @@ export default async function AdminPage() {
         })}
       </div>
 
-      <div className="rounded-2xl bg-white dark:bg-slate-800 shadow-card dark:shadow-card-dark p-6">
-        <h2 className="mb-4 text-lg font-bold text-text-dark dark:text-white">الإدارة السريعة</h2>
-        <p className="mb-5 text-xs text-text-light dark:text-slate-400">نسخة القواعد المحلية (Fallback): {stats.rulesVersion}</p>
+      <Card>
+        <h2 className="text-base font-bold text-slate-800 dark:text-white mb-1">الإدارة السريعة</h2>
+        <p className="text-xs text-muted mb-4">نسخة القواعد المحلية: {stats.rulesVersion}</p>
         <div className="flex flex-wrap gap-3">
           <Link href="/admin/updates">
-            <Button className="card-gradient text-white font-bold gap-2 shadow-lg">
+            <Button variant="gradient" size="sm">
               <RefreshCw className="h-4 w-4" />
               التحديثات
             </Button>
           </Link>
           <Link href="/admin/settings">
-            <Button variant="outline" className="gap-2 border-primary/30 text-primary hover:bg-primary/5">
+            <Button variant="outline" size="sm">
               <Settings className="h-4 w-4" />
               الإعدادات
             </Button>
           </Link>
           <Link href="/admin/content">
-            <Button variant="outline" className="gap-2 border-secondary/30 text-secondary hover:bg-secondary/5">
+            <Button variant="outline" size="sm">
               <BookOpen className="h-4 w-4" />
               المدونة
             </Button>
           </Link>
-          <Link href="/">
-            <Button variant="ghost" className="text-slate-400">
-              العودة للتطبيق
-            </Button>
-          </Link>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

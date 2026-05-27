@@ -4,25 +4,30 @@ import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger" | "gradient";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
 }
 
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
   primary:
-    "bg-gradient-to-l from-primary-dark to-primary text-white hover:opacity-90 shadow-md",
-  secondary: "bg-slate-200 text-slate-900 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-100",
+    "bg-primary text-white hover:brightness-110 shadow-button active:scale-[0.97] transition-all duration-150",
+  secondary:
+    "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 active:scale-[0.97] transition-all duration-150",
   outline:
-    "border-2 border-primary text-primary hover:bg-primary/5 dark:text-primary-light dark:border-primary-light",
-  ghost: "hover:bg-slate-100 dark:hover:bg-slate-800",
-  danger: "bg-red-600 text-white hover:bg-red-700",
+    "border-2 border-primary/30 text-primary hover:bg-primary/5 hover:border-primary/50 dark:border-primary/40 dark:text-primary-light active:scale-[0.97] transition-all duration-150",
+  ghost:
+    "text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 active:scale-[0.97] transition-all duration-150",
+  danger:
+    "bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20 active:scale-[0.97] transition-all duration-150",
+  gradient:
+    "gradient-primary text-white shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-[0.97] transition-all duration-150",
 };
 
 const sizeClasses: Record<NonNullable<ButtonProps["size"]>, string> = {
-  sm: "px-3 py-1.5 text-sm",
-  md: "px-4 py-2 text-base",
-  lg: "px-6 py-3 text-lg",
+  sm: "px-4 py-2 text-sm",
+  md: "px-5 py-2.5 text-sm",
+  lg: "px-8 py-3.5 text-base",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -45,8 +50,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled ?? isLoading}
         aria-busy={isLoading}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-2xl font-medium transition-all",
-          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+          "inline-flex items-center justify-center gap-2 rounded-2xl font-medium",
+          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary/50",
           "disabled:pointer-events-none disabled:opacity-50",
           variantClasses[variant],
           sizeClasses[size],

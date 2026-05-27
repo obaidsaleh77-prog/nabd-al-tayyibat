@@ -8,16 +8,15 @@ export default function AuthLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="relative flex min-h-screen flex-col">
-      {/* خلفية متدرجة — مفهوم النبض */}
+    <div className="relative flex min-h-screen flex-col bg-white dark:bg-slate-900">
       <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-emerald-50/80 via-white to-slate-50 dark:from-emerald-950/30 dark:via-slate-900 dark:to-slate-950"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/5 via-white to-secondary/5 dark:from-primary/10 dark:via-slate-900 dark:to-secondary/10"
         aria-hidden="true"
       />
 
-      <header className="relative z-10 flex items-center justify-between px-4 py-4 sm:px-8">
-        <Link href="/login" aria-label="الصفحة الرئيسية للمصادقة">
-          <AppLogo size={44} />
+      <header className="relative z-10 flex items-center justify-between px-5 py-4">
+        <Link href="/login" aria-label="الصفحة الرئيسية">
+          <AppLogo size={36} />
         </Link>
         <ThemeToggle />
       </header>
@@ -26,9 +25,8 @@ export default function AuthLayout({
         {children}
       </main>
 
-      <footer className="relative z-10 px-4 py-6 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} نبض الطيبات — أداة تتبع استرشادية وليست بديلاً عن
-        الاستشارة الطبية
+      <footer className="relative z-10 px-5 py-5 text-center text-xs text-muted">
+        © {new Date().getFullYear()} نبض الطيبات — أداة تتبع استرشادية
       </footer>
     </div>
   );

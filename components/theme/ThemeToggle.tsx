@@ -3,7 +3,7 @@
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 export function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -11,29 +11,30 @@ export function ThemeToggle() {
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) {
-    return (
-      <Button variant="ghost" size="sm" aria-label="تبديل الوضع" disabled>
-        <span className="h-5 w-5" />
-      </Button>
-    );
-  }
-
   const isDark = (theme === "system" ? resolvedTheme : theme) === "dark";
 
   return (
-    <Button
-      variant="ghost"
-      size="sm"
+    <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label={isDark ? "التبديل إلى الوضع النهاري" : "التبديل إلى الوضع الليلي"}
-      className="rounded-xl"
+      className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors"
     >
-      {isDark ? (
-        <Sun className="h-5 w-5 text-amber-400" aria-hidden="true" />
+      {mounted ? (
+        <motion.div
+          key={isDark ? "moon" : "sun"}
+          initial={{ rotate: -90, scale: 0.5, opacity: 0 }}
+          animate={{ rotate: 0, scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        >
+          {isDark ? (
+            <Moon className="h-4.5 w-4.5" />
+          ) : (
+            <Sun className="h-4.5 w-4.5" />
+          )}
+        </motion.div>
       ) : (
-        <Moon className="h-5 w-5 text-primary" aria-hidden="true" />
+        <span className="h-4.5 w-4.5" />
       )}
-    </Button>
+    </button>
   );
 }

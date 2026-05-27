@@ -16,18 +16,15 @@ export function AppLogo({
   className,
   title = "نبض الطيبات",
 }: AppLogoProps) {
-  const height = size;
-  const width = showText ? size * 2.8 : size;
-
   return (
     <div
-      className={cn("inline-flex items-center gap-3", className)}
+      className={cn("inline-flex items-center gap-2.5", className)}
       role="img"
       aria-label={title}
     >
       <svg
         width={size}
-        height={height}
+        height={size}
         viewBox="0 0 64 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -35,62 +32,39 @@ export function AppLogo({
         className="shrink-0"
       >
         <defs>
-          <linearGradient id="logo-primary" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#5A4BD1" />
-            <stop offset="100%" stopColor="#6C5CE7" />
-          </linearGradient>
-          <linearGradient id="logo-secondary" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#00CEC9" />
-            <stop offset="100%" stopColor="#55E6C1" />
+          <linearGradient id="logo-g" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#0EA5E9" />
+            <stop offset="100%" stopColor="#10B981" />
           </linearGradient>
         </defs>
 
-        <circle
-          cx="32"
-          cy="32"
-          r="30"
-          className="fill-primary/5 dark:fill-primary/10"
-        />
-
-        <path
-          d="M18 44V20h6l10 16V20h6v24h-6L24 28v16h-6z"
-          fill="url(#logo-primary)"
-        />
+        <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#logo-g)" />
 
         <motion.path
-          d="M8 32h10l4-8 4 16 4-12 4 8h18"
-          stroke="url(#logo-secondary)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          initial={{ pathLength: 0, opacity: 0.6 }}
-          animate={{
-            pathLength: [0, 1, 1],
-            opacity: [0.6, 1, 0.6],
-          }}
-          transition={{
-            pathLength: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-            opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-          }}
+          d="M20 44V22h6l10 14V22h6v22h-6L26 30v14h-6z"
+          fill="white"
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
         />
 
         <motion.circle
-          cx="52"
-          cy="32"
-          r="3"
-          fill="#00CEC9"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.8, 1, 0.8] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          cx="44"
+          cy="44"
+          r="10"
+          fill="white"
+          opacity="0.2"
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         />
       </svg>
 
       {showText ? (
-        <div className="flex flex-col leading-tight">
-          <span className="bg-gradient-to-l from-[#5A4BD1] to-[#6C5CE7] bg-clip-text text-lg font-bold text-transparent dark:from-[#8B7CF7] dark:to-[#6C5CE7]">
+        <div className="flex items-baseline gap-1">
+          <span className="bg-gradient-to-l from-primary to-secondary bg-clip-text text-lg font-bold text-transparent">
             نبض
           </span>
-          <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+          <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
             الطيبات
           </span>
         </div>

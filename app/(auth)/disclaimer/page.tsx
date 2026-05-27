@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { hasValidConsent } from "@/lib/auth/consent";
+import { Shield } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { DisclaimerForm } from "@/components/forms/DisclaimerForm";
 import { DisclaimerModal } from "@/components/forms/DisclaimerModal";
@@ -27,15 +28,18 @@ export default async function DisclaimerPage() {
 
   return (
     <>
-      {/* صفحة كاملة + مودال شفاف للإقرار */}
-      <Card className="w-full max-w-lg border-emerald-200/50 bg-white/90 backdrop-blur-sm dark:border-emerald-800/30 dark:bg-slate-900/90">
+      <Card className="w-full max-w-lg">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
+            <Shield className="h-5 w-5" />
+          </div>
+        </div>
         <CardHeader
           title="إقرار وإخلاء مسؤولية"
           description="يجب الموافقة قبل استخدام التطبيق"
         />
         <DisclaimerForm />
       </Card>
-
       <DisclaimerModal isOpen />
     </>
   );

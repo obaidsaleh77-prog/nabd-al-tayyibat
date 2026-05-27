@@ -2,6 +2,7 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { loginAction } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,64 +24,72 @@ export function LoginForm() {
   const [state, formAction] = useFormState(loginAction, initialState);
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader
-        title="تسجيل الدخول"
-        description="أدخل بريدك وكلمة المرور للمتابعة"
-      />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="w-full max-w-sm"
+    >
+      <Card>
+        <CardHeader title="تسجيل الدخول" description="أهلاً بعودتك إلى نبض الطيبات" />
 
-      <form action={formAction} className="space-y-4" noValidate>
-        {state.error ? (
-          <div
-            role="alert"
-            className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/50 dark:text-red-300"
+        <form action={formAction} className="space-y-4" noValidate>
+          {state.error ? (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              role="alert"
+              className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-950/30 dark:text-red-400"
+            >
+              {state.error}
+            </motion.div>
+          ) : null}
+
+          {state.success ? (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              role="status"
+              className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
+            >
+              {state.success}
+            </motion.div>
+          ) : null}
+
+          <Input
+            name="email"
+            type="email"
+            label="البريد الإلكتروني"
+            autoComplete="email"
+            required
+            dir="ltr"
+            className="text-left"
+          />
+
+          <Input
+            name="password"
+            type="password"
+            label="كلمة المرور"
+            autoComplete="current-password"
+            required
+            minLength={8}
+            dir="ltr"
+            className="text-left"
+          />
+
+          <SubmitButton />
+        </form>
+
+        <p className="mt-6 text-center text-sm text-muted">
+          ليس لديك حساب؟{" "}
+          <Link
+            href="/register"
+            className="font-medium text-primary hover:text-primary-light transition-colors"
           >
-            {state.error}
-          </div>
-        ) : null}
-
-        {state.success ? (
-          <div
-            role="status"
-            className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-300"
-          >
-            {state.success}
-          </div>
-        ) : null}
-
-        <Input
-          name="email"
-          type="email"
-          label="البريد الإلكتروني"
-          autoComplete="email"
-          required
-          dir="ltr"
-          className="text-left"
-        />
-
-        <Input
-          name="password"
-          type="password"
-          label="كلمة المرور"
-          autoComplete="current-password"
-          required
-          minLength={8}
-          dir="ltr"
-          className="text-left"
-        />
-
-        <SubmitButton />
-      </form>
-
-      <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
-        ليس لديك حساب؟{" "}
-        <Link
-          href="/register"
-          className="font-medium text-emerald-600 hover:underline dark:text-emerald-400"
-        >
-          إنشاء حساب
-        </Link>
-      </p>
-    </Card>
+            إنشاء حساب
+          </Link>
+        </p>
+      </Card>
+    </motion.div>
   );
 }

@@ -29,8 +29,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#6C5CE7" },
-    { media: "(prefers-color-scheme: dark)", color: "#452AB8" },
+    { media: "(prefers-color-scheme: light)", color: "#0EA5E9" },
+    { media: "(prefers-color-scheme: dark)", color: "#0369A1" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -43,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
-      <body className={`${tajawal.variable} font-arabic min-h-screen bg-surface dark:bg-slate-900 text-text-dark dark:text-slate-100`}>
+      <body className={`${tajawal.variable} font-arabic min-h-screen bg-white dark:bg-surface-dark text-slate-900 dark:text-slate-100`}>
         <ThemeProvider>
           {children}
           <ServiceWorkerRegister />

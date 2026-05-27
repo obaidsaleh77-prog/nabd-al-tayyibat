@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { CalendarDays, Utensils, Scale, Target, Sparkles } from "lucide-react";
+import {
+  Utensils,
+  Scale,
+  Activity,
+  ChevronLeft,
+  Timer,
+} from "lucide-react";
 import { ComplianceGauge } from "@/components/charts/ComplianceGauge";
 import { MealForm } from "@/components/forms/MealForm";
 import { Card } from "@/components/ui/card";
 import { getTodayMeals, getTodayCompliance } from "@/app/actions/meals";
 import { formatNumberAr } from "@/lib/utils";
 import type { ComplianceSnapshot } from "@/types/database";
-
-const DAYS = ["أحد", "إثن", "ثلاث", "أربع", "خميس", "جمعة", "سبت"];
+import Link from "next/link";
 
 export const metadata: Metadata = { title: "نبض الطيبات" };
 
@@ -29,141 +34,152 @@ export default async function DashboardPage() {
   ]);
 
   const percent = compliance?.total_percent ?? 0;
-  const today = new Date();
-  const todayIndex = today.getDay();
-  const todayDate = today.getDate();
-
-  const calendarDays = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(todayDate - todayIndex + i);
-    return {
-      day: DAYS[d.getDay()] ?? "",
-      date: d.getDate(),
-      active: i === todayIndex,
-    };
-  });
+  const todayName = new Intl.DateTimeFormat("ar-SA", { weekday: "long" }).format(new Date());
+  const todayFull = new Intl.DateTimeFormat("ar-SA", {
+    day: "numeric",
+    month: "long",
+  }).format(new Date());
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="mx-auto max-w-2xl space-y-5 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-primary">مرحباً بعودتك</p>
-          <h1 className="text-2xl font-bold text-text-dark dark:text-white">
-            {profile?.full_name || "مستخدم نبض الطيبات"}
+          <p className="text-xs text-muted">{todayName}</p>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+            {todayFull}
           </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            مرحباً {profile?.full_name?.split(" ")[0] || "مستخدم"}
+          </p>
         </div>
-        <div className="flex items-center gap-2 rounded-2xl bg-primary/10 px-4 py-2 text-primary">
-          <CalendarDays className="h-5 w-5" />
-          <span className="text-sm font-medium">{today.toLocaleDateString("ar-SA")}</span>
-        </div>
-      </div>
-
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {calendarDays.map((d) => (
-          <button
-            key={d.day}
-            className={`flex min-w-[72px] flex-col items-center rounded-2xl py-3 px-4 transition-all ${
-              d.active
-                ? "card-gradient text-white shadow-lg scale-105"
-                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-            }`}
-          >
-            <span className="text-xs font-medium">{d.day}</span>
-            <span className="text-lg font-bold">{d.date}</span>
-          </button>
-        ))}
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        <div className="md:col-span-1">
-          <ComplianceGauge
-            percent={Math.round(percent)}
-            snapshot={compliance as ComplianceSnapshot | null}
-          />
-        </div>
-        <div className="md:col-span-2">
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="border-0 bg-white dark:bg-slate-800 shadow-card dark:shadow-card-dark">
-              <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-secondary/10 p-3 text-secondary">
-                  <Utensils className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-xs text-text-light dark:text-slate-400">وجبات اليوم</p>
-                  <p className="text-2xl font-bold text-text-dark dark:text-white">{formatNumberAr(meals.length)}</p>
-                </div>
-              </div>
-            </Card>
-            <Card className="border-0 bg-white dark:bg-slate-800 shadow-card dark:shadow-card-dark">
-              <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-primary/10 p-3 text-primary">
-                  <Target className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-xs text-text-light dark:text-slate-400">نسبة الالتزام</p>
-                  <p className="text-2xl font-bold text-text-dark dark:text-white">{Math.round(percent)}%</p>
-                </div>
-              </div>
-            </Card>
+        <div className="flex flex-col items-center">
+          <div className="gradient-primary rounded-2xl px-5 py-3 text-white text-center shadow-lg shadow-primary/20">
+            <p className="text-xs opacity-80">التزام اليوم</p>
+            <p className="text-2xl font-bold leading-tight">{formatNumberAr(Math.round(percent))}%</p>
           </div>
+        </div>
+      </div>
 
-          <div className="mt-4 rounded-2xl card-gradient p-4 text-white">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5" />
-              <span className="text-sm font-medium">نصيحة اليوم</span>
+      <div className="grid grid-cols-2 gap-3">
+        <Link href="/meals">
+          <Card className="p-4 hover:shadow-elevated transition-all duration-200 active:scale-[0.98]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10 text-secondary">
+                <Utensils className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs text-muted">وجبات اليوم</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-white">{formatNumberAr(meals.length)}</p>
+              </div>
             </div>
-            <p className="mt-1 text-sm opacity-90">
+          </Card>
+        </Link>
+        <Link href="/weight">
+          <Card className="p-4 hover:shadow-elevated transition-all duration-200 active:scale-[0.98]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Scale className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs text-muted">الوزن</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-white">تسجيل</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        <Link href="/health-status">
+          <Card className="p-4 hover:shadow-elevated transition-all duration-200 active:scale-[0.98]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
+                <Activity className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs text-muted">الحالة</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-white">صحتي</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        <Link href="/rules">
+          <Card className="p-4 hover:shadow-elevated transition-all duration-200 active:scale-[0.98]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Timer className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs text-muted">الدليل</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-white">الغذائي</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+      </div>
+
+      <div className="grid gap-5 md:grid-cols-2">
+        <ComplianceGauge
+          percent={Math.round(percent)}
+          snapshot={compliance as ComplianceSnapshot | null}
+        />
+        <div className="space-y-3">
+          <Card className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-bold text-slate-800 dark:text-white">وجبات اليوم</h2>
+              <Link href="/meals" className="text-xs text-primary flex items-center gap-1">
+                الكل <ChevronLeft className="h-3 w-3" />
+              </Link>
+            </div>
+            {meals.length === 0 ? (
+              <p className="text-sm text-muted py-4 text-center">لم تُسجّل وجبات بعد</p>
+            ) : (
+              <ul className="space-y-2">
+                {meals.slice(0, 4).map((m) => {
+                  const ingredients = Array.isArray(m.ingredients) ? (m.ingredients as string[]) : [];
+                  return (
+                    <li
+                      key={m.id}
+                      className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2.5 dark:bg-slate-800/50"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs text-muted">
+                          {new Date(m.started_at).toLocaleTimeString("ar-SA", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                        <p className="text-sm text-slate-700 dark:text-slate-300 truncate">
+                          {ingredients.slice(0, 2).join("، ")}
+                          {ingredients.length > 2 ? "..." : ""}
+                        </p>
+                      </div>
+                      <span
+                        className={`shrink-0 rounded-lg px-2 py-0.5 text-[11px] font-medium ${
+                          m.status === "flagged"
+                            ? "bg-red-50 text-red-500 dark:bg-red-950/30 dark:text-red-400"
+                            : "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
+                        }`}
+                      >
+                        {m.status === "flagged" ? "مخالفة" : "مقبول"}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </Card>
+
+          <Card className="p-4 gradient-primary text-white shadow-lg shadow-primary/20">
+            <div className="flex items-center gap-2 mb-1">
+              <Activity className="h-4 w-4 opacity-80" />
+              <span className="text-sm font-medium opacity-90">نصيحة اليوم</span>
+            </div>
+            <p className="text-sm leading-relaxed opacity-90">
               حافظ على الفترة 4 ساعات بين الوجبات لتحقيق أقصى استفادة من نظام الطيبات.
             </p>
-          </div>
+          </Card>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <MealForm />
-        <Card className="border-0 bg-white dark:bg-slate-800 shadow-card dark:shadow-card-dark">
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-text-dark dark:text-white">
-            <Utensils className="h-5 w-5 text-primary" />
-            وجبات اليوم
-          </h2>
-          {meals.length === 0 ? (
-            <div className="rounded-2xl bg-slate-50 dark:bg-slate-800/50 py-8 text-center text-sm text-text-light dark:text-slate-500">
-              لم تُسجّل وجبات بعد
-            </div>
-          ) : (
-            <ul className="space-y-3">
-              {meals.map((m) => {
-                const ingredients = Array.isArray(m.ingredients) ? (m.ingredients as string[]) : [];
-                return (
-                  <li
-                    key={m.id}
-                    className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-800/50"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="rounded-lg bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                        {new Date(m.started_at).toLocaleTimeString("ar-SA", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                      {m.status === "flagged" ? (
-                        <span className="rounded-lg bg-red-100 px-2 py-0.5 text-xs text-red-600 dark:bg-red-950/40 dark:text-red-400">
-                          مخالفة
-                        </span>
-                      ) : (
-                        <span className="rounded-lg bg-emerald-100 px-2 py-0.5 text-xs text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
-                          مقبول
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{ingredients.join("، ")}</p>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </Card>
-      </div>
+      <MealForm />
     </div>
   );
 }
