@@ -2,15 +2,46 @@
 
 import { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
-import { Camera, Scan } from "lucide-react";
+import { Camera, Scan, RotateCw } from "lucide-react";
 import { validateOcrTextAction } from "@/app/actions/rules";
 import type { IngredientMatchResult, ValidationSummary } from "@/lib/rules/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 
-const DISCLAIMER =
-  "نتائج استرشادية ولا تغني عن قراءة الملصق الغذائي الأصلي";
+const DISCLAIMER = "نتائج استرشادية ولا تغني عن قراءة الملصق الغذائي الأصلي";
+
+function preprocessImage(imageSrc: string): HTMLCanvasElement | null {
+  const img = new Image();
+  img.src = imageSrc;
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  ctx.drawImage(img, 0, 0);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < imageData.data.length; i += 4) {
+    const r = imageData.data[i]!;
+    const g = imageData.data[i + 1]!;
+    const b = imageData.data[i + 2]!;
+    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+    const contrast = gray > 128 ? 255 : 0;
+    imageData.data[i] = contrast;
+    imageData.data[i + 1] = contrast;
+    imageData.data[i + 2] = contrast;
+  }
+  ctx.putImageData(imageData, 0, 0);
+  return canvas;
+}
+
+function cleanOcrText(text: string): string {
+  return text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.length > 1)
+    .join(", ");
+}
 
 function ResultBadge({ result }: { result: IngredientMatchResult }) {
   const styles =
@@ -20,8 +51,7 @@ function ResultBadge({ result }: { result: IngredientMatchResult }) {
         ? "border-red-300 bg-red-50 text-red-800 dark:bg-red-950/50"
         : "border-amber-300 bg-amber-50 text-amber-800 dark:bg-amber-950/50";
 
-  const icon =
-    result.status === "allowed" ? "✅" : result.status === "prohibited" ? "❌" : "⚠️";
+  const icon = result.status === "allowed" ? "✅" : result.status === "prohibited" ? "❌" : "⚠️";
 
   return (
     <li className={`rounded-lg border px-3 py-2 text-sm ${styles}`}>
@@ -41,9 +71,10 @@ export function CameraScanner() {
   const [ocrText, setOcrText] = useState("");
   const [results, setResults] = useState<ValidationSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
 
   const captureAndScan = useCallback(async () => {
-    const imageSrc = webcamRef.current?.getScreenshot();
+    const imageSrc = webcamRef.current?.getScreenshot({ width: 1920, height: 1080 });
     if (!imageSrc) {
       setError("تعذر التقاط الصورة");
       return;
@@ -53,14 +84,30 @@ export function CameraScanner() {
     setError(null);
 
     try {
+      const preprocessed = preprocessImage(imageSrc);
+      const srcToUse = preprocessed ? preprocessed.toDataURL("image/jpeg", 0.95) : imageSrc;
+
       const { createWorker } = await import("tesseract.js");
-      const worker = await createWorker("ara");
-      const { data } = await worker.recognize(imageSrc);
+      const worker = await createWorker("ara+eng", 1, {
+        logger: (m) => {
+          if (m.status === "recognizing text") return;
+        },
+      });
+      await worker.setParameters({
+        tessedit_pageseg_mode: "6" as any,
+      });
+      const { data } = await worker.recognize(srcToUse);
       await worker.terminate();
 
-      const text = data.text;
-      setOcrText(text);
-      const validationResult = await validateOcrTextAction(text);
+      const cleaned = cleanOcrText(data.text);
+      setOcrText(cleaned);
+
+      if (!cleaned.trim()) {
+        setError("لم يتم التعرف على أي نص. حاول إضاءة أفضل أو تصوير أقرب.");
+        return;
+      }
+
+      const validationResult = await validateOcrTextAction(cleaned);
       setResults(validationResult);
     } catch (e) {
       console.error(e);
@@ -84,6 +131,10 @@ export function CameraScanner() {
     }
   };
 
+  const toggleCamera = () => {
+    setFacingMode((prev) => (prev === "environment" ? "user" : "environment"));
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -97,8 +148,11 @@ export function CameraScanner() {
             ref={webcamRef}
             audio={false}
             screenshotFormat="image/jpeg"
-            videoConstraints={{ facingMode: "environment" }}
+            screenshotQuality={1}
+            videoConstraints={{ facingMode, width: 1920, height: 1080 }}
             className="w-full"
+            minScreenshotWidth={1920}
+            minScreenshotHeight={1080}
           />
         </div>
 
@@ -106,6 +160,10 @@ export function CameraScanner() {
           <Button onClick={captureAndScan} isLoading={scanning} disabled={scanning}>
             <Scan className="h-4 w-4" />
             مسح الملصق
+          </Button>
+          <Button variant="outline" onClick={toggleCamera} disabled={scanning}>
+            <RotateCw className="h-4 w-4" />
+            تبديل الكاميرا
           </Button>
         </div>
 
