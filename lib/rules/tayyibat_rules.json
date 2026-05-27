@@ -1,0 +1,106 @@
+{
+  "version": "1.0.0",
+  "allowed": {
+    "starches": {
+      "name": "نشويات",
+      "keywords": ["أرز", "بطاطا", "بطاطس", "ذرة", "شوفان"],
+      "conditions": "حسب الجدول الزمني للنظام",
+      "penalty_on_violation": 10,
+      "frequency_limit": "حسب الخطة اليومية"
+    },
+    "fats": {
+      "name": "دهون",
+      "keywords": ["زيت زيتون", "سمن نباتي", "زيت نباتي"],
+      "conditions": "بكميات محددة",
+      "penalty_on_violation": 8,
+      "frequency_limit": null
+    },
+    "cheeses": {
+      "name": "أجبان",
+      "keywords": ["جبنة مسموحة", "جبن قليل الدسم"],
+      "conditions": "الأنواع المسموحة فقط",
+      "penalty_on_violation": 10,
+      "frequency_limit": null
+    },
+    "meats": {
+      "name": "لحوم",
+      "keywords": ["لحم أحمر", "دجاج", "سمك"],
+      "conditions": "بدون إضافات محظورة",
+      "penalty_on_violation": 12,
+      "frequency_limit": null
+    },
+    "fruits_allowed": {
+      "name": "فواكه",
+      "keywords": ["تفاح", "برتقال", "موز", "توت"],
+      "conditions": "حسب المرحلة",
+      "penalty_on_violation": 8,
+      "frequency_limit": "يومي"
+    },
+    "sweets": {
+      "name": "حلويات",
+      "keywords": ["عسل", "حلوى مسموحة"],
+      "conditions": "كميات محدودة",
+      "penalty_on_violation": 10,
+      "frequency_limit": "أسبوعي"
+    },
+    "drinks_allowed": {
+      "name": "مشروبات",
+      "keywords": ["ماء", "شاي", "قهوة بدون حليب"],
+      "conditions": "بدون سكر مضاف",
+      "penalty_on_violation": 5,
+      "frequency_limit": null
+    }
+  },
+  "prohibited": {
+    "dairy": {
+      "name": "ألبان",
+      "severity": "high",
+      "keywords": ["حليب", "لبن", "رايب", "لبنة", "قشطة", "كريمة"]
+    },
+    "eggs": {
+      "name": "بيض",
+      "severity": "high",
+      "keywords": ["بيض", "أومليت", "مايونيز"]
+    },
+    "baked": {
+      "name": "مخبوزات",
+      "severity": "medium",
+      "keywords": ["خبز", "معكرونة", "كيك", "بسكويت", "شعيرية"]
+    },
+    "vegetables": {
+      "name": "خضروات",
+      "severity": "medium",
+      "keywords": ["طماطم", "خيار", "بصل", "ثوم", "خس", "جزر"]
+    },
+    "legumes": {
+      "name": "بقوليات",
+      "severity": "high",
+      "keywords": ["عدس", "حمص", "فول", "فاصوليا", "بازيلا"]
+    },
+    "protein_banned": {
+      "name": "بروتين ممنوع",
+      "severity": "critical",
+      "keywords": ["جبنة صفراء", "لانشون", "نقانق", "برجر"]
+    },
+    "fruits_banned": {
+      "name": "فواكه ممنوعة",
+      "severity": "medium",
+      "keywords": ["عنب", "بطيخ", "مانجو", "تمر"]
+    },
+    "drinks_banned": {
+      "name": "مشروبات ممنوعة",
+      "severity": "high",
+      "keywords": ["عصير", "مشروب غازي", "كولا", "شاي بالحليب"]
+    },
+    "additives": {
+      "name": "إضافات",
+      "severity": "critical",
+      "keywords": ["سكر", "محليات", "جلوتين", "خميرة", "MSG", "ملح مفرط"]
+    }
+  },
+  "ocr_matching_rules": {
+    "fuzzy_match_threshold": 0.75,
+    "arabic_normalization": true,
+    "ignore_diacritics": true
+  }
+}

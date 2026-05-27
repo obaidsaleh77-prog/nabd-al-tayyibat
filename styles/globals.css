@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-emerald-from: #059669;
+  --color-emerald-to: #10b981;
+  --color-gold: #f59e0b;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --muted: #64748b;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --card: #1e293b;
+  --border: #334155;
+  --muted: #94a3b8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply font-arabic antialiased;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* تحسين إمكانية الوصول: focus واضح */
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-emerald-600;
+}
+
+/* تقليل الحركة عند طلب المستخدم */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
