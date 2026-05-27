@@ -11,28 +11,26 @@ import { Spinner } from "@/components/ui/spinner";
 
 const DISCLAIMER = "نتائج استرشادية ولا تغني عن قراءة الملصق الغذائي الأصلي";
 
-function preprocessImage(imageSrc: string): HTMLCanvasElement | null {
-  const img = new Image();
-  img.src = imageSrc;
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("فشل تحميل الصورة"));
+    img.src = src;
+  });
+}
+
+async function resizeImage(src: string, maxDim: number, quality: number): Promise<string> {
+  const img = await loadImage(src);
+  const scale = maxDim / Math.max(img.width, img.height);
+  if (scale >= 1) return src;
+  const w = Math.round(img.width * scale);
+  const h = Math.round(img.height * scale);
   const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return null;
-  canvas.width = img.naturalWidth;
-  canvas.height = img.naturalHeight;
-  ctx.drawImage(img, 0, 0);
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  for (let i = 0; i < imageData.data.length; i += 4) {
-    const r = imageData.data[i]!;
-    const g = imageData.data[i + 1]!;
-    const b = imageData.data[i + 2]!;
-    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-    const contrast = gray > 128 ? 255 : 0;
-    imageData.data[i] = contrast;
-    imageData.data[i + 1] = contrast;
-    imageData.data[i + 2] = contrast;
-  }
-  ctx.putImageData(imageData, 0, 0);
-  return canvas;
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+  return canvas.toDataURL("image/jpeg", quality);
 }
 
 function cleanOcrText(text: string): string {
@@ -74,8 +72,8 @@ export function CameraScanner() {
   const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
 
   const captureAndScan = useCallback(async () => {
-    const imageSrc = webcamRef.current?.getScreenshot({ width: 1920, height: 1080 });
-    if (!imageSrc) {
+    const rawImage = webcamRef.current?.getScreenshot({ width: 1920, height: 1080 });
+    if (!rawImage) {
       setError("تعذر التقاط الصورة");
       return;
     }
@@ -84,33 +82,23 @@ export function CameraScanner() {
     setError(null);
 
     try {
-      const preprocessed = preprocessImage(imageSrc);
-      const srcToUse = preprocessed ? preprocessed.toDataURL("image/jpeg", 0.9) : imageSrc;
-
-      const img = new Image();
-      img.src = srcToUse;
-      await new Promise((r) => { img.onload = r; });
-      const scale = 800 / Math.max(img.width, img.height);
-      const w = Math.round(img.width * scale);
-      const h = Math.round(img.height * scale);
-      const resizeCanvas = document.createElement("canvas");
-      resizeCanvas.width = w;
-      resizeCanvas.height = h;
-      const rctx = resizeCanvas.getContext("2d")!;
-      rctx.drawImage(img, 0, 0, w, h);
-      const compressed = resizeCanvas.toDataURL("image/jpeg", 0.7);
+      const smallImage = await resizeImage(rawImage, 1200, 0.8);
 
       let text = "";
-      const aiResult = await analyzeImageWithAI(compressed);
-      text = aiResult.text;
+      try {
+        const aiResult = await analyzeImageWithAI(smallImage);
+        text = aiResult.text;
+      } catch (e) {
+        console.warn("AI vision failed, falling back to Tesseract:", e);
+      }
 
       if (!text.trim()) {
         const { createWorker } = await import("tesseract.js");
         const worker = await createWorker("ara+eng", 1);
         await worker.setParameters({ tessedit_pageseg_mode: "6" as any });
-        const { data } = await worker.recognize(srcToUse);
+        const { data } = await worker.recognize(smallImage);
         await worker.terminate();
-        text = cleanOcrText(data.text);
+        text = data.text;
       }
 
       const cleaned = cleanOcrText(text);
