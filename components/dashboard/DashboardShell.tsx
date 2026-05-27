@@ -16,7 +16,7 @@ import {
   LogOut,
   Menu,
   X,
-  ChevronLeft,
+  Shield,
 } from "lucide-react";
 import { useState } from "react";
 import { AppLogo } from "@/components/branding/AppLogo";
@@ -30,6 +30,7 @@ interface NavItem {
   label: string;
   icon: typeof LayoutDashboard;
   flag?: string;
+  adminOnly?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -42,6 +43,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/blog", label: "المدونة", icon: BookOpen, flag: "blog" },
   { href: "/camera", label: "الكاميرا", icon: Camera, flag: "camera_ocr" },
   { href: "/settings", label: "الإعدادات", icon: Settings },
+  { href: "/admin", label: "الإدارة", icon: Shield, adminOnly: true },
 ];
 
 const BOTTOM_ITEMS: NavItem[] = [
@@ -55,15 +57,17 @@ const BOTTOM_ITEMS: NavItem[] = [
 interface DashboardShellProps {
   children: React.ReactNode;
   enabledFlags?: Record<string, boolean>;
+  isAdmin?: boolean;
 }
 
-function NavLinks({ enabledFlags = {} }: { enabledFlags?: Record<string, boolean> }) {
+function NavLinks({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<string, boolean>; isAdmin?: boolean }) {
   const pathname = usePathname();
 
   return (
     <nav className="flex flex-col gap-1" aria-label="التنقل الرئيسي">
       {NAV_ITEMS.map((item) => {
         if (item.flag && enabledFlags[item.flag] === false) return null;
+        if (item.adminOnly && !isAdmin) return null;
         const Icon = item.icon;
         const active = pathname === item.href;
         return (
@@ -74,7 +78,8 @@ function NavLinks({ enabledFlags = {} }: { enabledFlags?: Record<string, boolean
               "group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all duration-200",
               active
                 ? "bg-primary/10 text-primary"
-                : "text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50"
+                : "text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50",
+              item.adminOnly && "border-t border-slate-100 dark:border-slate-800 mt-2 pt-3"
             )}
             aria-current={active ? "page" : undefined}
           >
@@ -96,15 +101,19 @@ function NavLinks({ enabledFlags = {} }: { enabledFlags?: Record<string, boolean
   );
 }
 
-function BottomNav({ enabledFlags = {} }: { enabledFlags?: Record<string, boolean> }) {
+function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<string, boolean>; isAdmin?: boolean }) {
   const pathname = usePathname();
+
+  const items = isAdmin
+    ? [...BOTTOM_ITEMS.slice(0, -1), { href: "/admin", label: "الإدارة", icon: Shield }, ...BOTTOM_ITEMS.slice(-1)]
+    : BOTTOM_ITEMS;
 
   return (
     <nav
       className="fixed bottom-0 inset-x-0 z-50 flex items-center justify-around bg-white/80 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-800 safe-bottom backdrop-blur-xl lg:hidden"
       aria-label="التنقل السفلي"
     >
-      {BOTTOM_ITEMS.map((item) => {
+      {items.map((item) => {
         if (item.flag && enabledFlags[item.flag] === false) return null;
         const Icon = item.icon;
         const active = pathname === item.href;
@@ -114,13 +123,16 @@ function BottomNav({ enabledFlags = {} }: { enabledFlags?: Record<string, boolea
             href={item.href}
             className={cn(
               "relative flex flex-col items-center gap-0.5 py-2 px-3 min-w-[56px] transition-all",
-              active ? "text-primary" : "text-slate-400 dark:text-slate-500"
+              active ? (item.href === "/admin" ? "text-amber-500" : "text-primary") : "text-slate-400 dark:text-slate-500"
             )}
           >
             {active ? (
               <motion.div
                 layoutId="nav-pill"
-                className="absolute -top-px inset-x-2 h-0.5 rounded-full bg-primary"
+                className={cn(
+                  "absolute -top-px inset-x-2 h-0.5 rounded-full",
+                  item.href === "/admin" ? "bg-amber-500" : "bg-primary"
+                )}
                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
               />
             ) : null}
@@ -135,7 +147,7 @@ function BottomNav({ enabledFlags = {} }: { enabledFlags?: Record<string, boolea
 
 const springTransition = { type: "spring", stiffness: 300, damping: 30 };
 
-export function DashboardShellClient({ children, enabledFlags }: DashboardShellProps) {
+export function DashboardShellClient({ children, enabledFlags, isAdmin }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -146,7 +158,7 @@ export function DashboardShellClient({ children, enabledFlags }: DashboardShellP
           <ThemeToggle />
         </div>
         <div className="flex-1 overflow-y-auto px-3 py-5">
-          <NavLinks enabledFlags={enabledFlags} />
+          <NavLinks enabledFlags={enabledFlags} isAdmin={isAdmin} />
         </div>
         <div className="px-3 py-4 border-t border-slate-100 dark:border-slate-800">
           <form action={signOutAction}>
@@ -201,7 +213,7 @@ export function DashboardShellClient({ children, enabledFlags }: DashboardShellP
                   <AppLogo size={28} />
                 </div>
                 <div className="overflow-y-auto px-3 py-5">
-                  <NavLinks enabledFlags={enabledFlags} />
+                  <NavLinks enabledFlags={enabledFlags} isAdmin={isAdmin} />
                 </div>
                 <div className="px-3 py-4 border-t border-slate-100 dark:border-slate-800">
                   <form action={signOutAction}>
@@ -232,7 +244,7 @@ export function DashboardShellClient({ children, enabledFlags }: DashboardShellP
         </main>
       </div>
 
-      <BottomNav enabledFlags={enabledFlags} />
+      <BottomNav enabledFlags={enabledFlags} isAdmin={isAdmin} />
     </div>
   );
 }

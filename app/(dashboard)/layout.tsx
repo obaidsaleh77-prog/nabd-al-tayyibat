@@ -22,7 +22,15 @@ export default async function DashboardLayout({
 
   const enabledFlags = await getFeatureFlagsMap();
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  const isAdmin = profile?.role === "admin";
+
   return (
-    <DashboardShellClient enabledFlags={enabledFlags}>{children}</DashboardShellClient>
+    <DashboardShellClient enabledFlags={enabledFlags} isAdmin={isAdmin}>{children}</DashboardShellClient>
   );
 }
