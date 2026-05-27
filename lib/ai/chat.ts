@@ -1,7 +1,7 @@
 import Groq from "groq-sdk";
 import { RunnableLambda } from "@langchain/core/runnables";
 import { TAYYIBAT_SYSTEM_PROMPT, buildRagContext } from "./prompts";
-import { getRulesContextSummary, fetchKnowledgeContext } from "./rag";
+import { getRulesContextSummary } from "./rag";
 
 export interface ChatHistoryItem {
   role: "user" | "assistant";
@@ -61,8 +61,7 @@ export async function generateTayyibatReply(
   }
 
   const rulesSummary = await getRulesContextSummary();
-  const docs = await fetchKnowledgeContext(userMessage);
-  const ragContext = buildRagContext(rulesSummary, docs);
+  const ragContext = buildRagContext(rulesSummary);
 
   const trimmedHistory = history.slice(-MAX_HISTORY);
 
