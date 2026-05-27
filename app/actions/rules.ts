@@ -159,3 +159,50 @@ export async function validateOcrTextAction(text: string): Promise<ValidationSum
     return matchOcrText(text);
   }
 }
+
+/**
+ * تحليل الصورة بالذكاء الاصطناعي لاستخراج النص بدقة عالية
+ */
+export async function analyzeImageWithAI(imageBase64: string): Promise<{ text: string }> {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) {
+    return { text: "" };
+  }
+
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: process.env.GROQ_VISION_MODEL ?? "llama-3.2-90b-vision-preview",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "استخرج كل النص المكتوب في هذه الصورة بدقة. إذا كان النص عربي أو إنجليزي أو مختلط، استخرج كل الكلمات والأرقام. أعد فقط النص المستخرج بدون شرح أو مقدمة. افصل بين العناصر بفاصلة.",
+            },
+            {
+              type: "image_url",
+              image_url: { url: imageBase64 },
+            },
+          ],
+        },
+      ],
+      max_tokens: 1024,
+      temperature: 0.1,
+    }),
+  });
+
+  if (!response.ok) {
+    console.error("Groq vision API error:", await response.text());
+    return { text: "" };
+  }
+
+  const json = await response.json();
+  const extracted = json?.choices?.[0]?.message?.content ?? "";
+  return { text: extracted.trim() };
+}

@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { Camera, Scan, RotateCw } from "lucide-react";
-import { validateOcrTextAction } from "@/app/actions/rules";
+import { validateOcrTextAction, analyzeImageWithAI } from "@/app/actions/rules";
 import type { IngredientMatchResult, ValidationSummary } from "@/lib/rules/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -85,21 +85,35 @@ export function CameraScanner() {
 
     try {
       const preprocessed = preprocessImage(imageSrc);
-      const srcToUse = preprocessed ? preprocessed.toDataURL("image/jpeg", 0.95) : imageSrc;
+      const srcToUse = preprocessed ? preprocessed.toDataURL("image/jpeg", 0.9) : imageSrc;
 
-      const { createWorker } = await import("tesseract.js");
-      const worker = await createWorker("ara+eng", 1, {
-        logger: (m) => {
-          if (m.status === "recognizing text") return;
-        },
-      });
-      await worker.setParameters({
-        tessedit_pageseg_mode: "6" as any,
-      });
-      const { data } = await worker.recognize(srcToUse);
-      await worker.terminate();
+      const img = new Image();
+      img.src = srcToUse;
+      await new Promise((r) => { img.onload = r; });
+      const scale = 800 / Math.max(img.width, img.height);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const resizeCanvas = document.createElement("canvas");
+      resizeCanvas.width = w;
+      resizeCanvas.height = h;
+      const rctx = resizeCanvas.getContext("2d")!;
+      rctx.drawImage(img, 0, 0, w, h);
+      const compressed = resizeCanvas.toDataURL("image/jpeg", 0.7);
 
-      const cleaned = cleanOcrText(data.text);
+      let text = "";
+      const aiResult = await analyzeImageWithAI(compressed);
+      text = aiResult.text;
+
+      if (!text.trim()) {
+        const { createWorker } = await import("tesseract.js");
+        const worker = await createWorker("ara+eng", 1);
+        await worker.setParameters({ tessedit_pageseg_mode: "6" as any });
+        const { data } = await worker.recognize(srcToUse);
+        await worker.terminate();
+        text = cleanOcrText(data.text);
+      }
+
+      const cleaned = cleanOcrText(text);
       setOcrText(cleaned);
 
       if (!cleaned.trim()) {
