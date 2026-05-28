@@ -11,7 +11,6 @@ import type { ViolationSeverity } from "@/lib/rules/types";
 
 const mealSchema = z.object({
   startedAt: z.string().min(1),
-  endedAt: z.string().optional(),
   ingredients: z.string().min(1, "أدخل مكوناً واحداً على الأقل"),
   notes: z.string().optional(),
 });
@@ -39,7 +38,6 @@ export async function addMealAction(
 
   const parsed = mealSchema.safeParse({
     startedAt: formData.get("startedAt"),
-    endedAt: formData.get("endedAt") || undefined,
     ingredients: formData.get("ingredients"),
     notes: formData.get("notes") || undefined,
   });
@@ -62,7 +60,6 @@ export async function addMealAction(
     .insert({
       user_id: userId,
       started_at: parsed.data.startedAt,
-      ended_at: parsed.data.endedAt || null,
       ingredients: ingredientList,
       notes: parsed.data.notes || null,
       status: validation.violations.length > 0 ? "flagged" : "confirmed",

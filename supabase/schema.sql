@@ -98,7 +98,6 @@ CREATE TABLE public.meals (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   started_at TIMESTAMPTZ NOT NULL,
-  ended_at TIMESTAMPTZ,
   ingredients JSONB NOT NULL DEFAULT '[]',
   notes TEXT,
   status public.meal_log_status NOT NULL DEFAULT 'pending',

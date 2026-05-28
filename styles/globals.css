@@ -7,11 +7,14 @@
   --primary-light: #38BDF8;
   --secondary: #10B981;
   --accent: #F59E0B;
-  --background: #FFFFFF;
-  --surface: #F5F7FA;
+  --background: #F5F7FA;
+  --surface: #FFFFFF;
   --foreground: #1A1A2E;
   --muted: #94A3B8;
   --border: #E8ECF0;
+  /* 8pt Grid System */
+  --space-unit: 8px;
+  --radius-unit: 8px;
 }
 
 .dark {
@@ -30,10 +33,11 @@ html {
 
 body {
   @apply antialiased;
-  background-color: var(--surface);
+  background-color: var(--background);
   color: var(--foreground);
   font-feature-settings: "kern" 1, "ss01" 1;
   overflow-x: hidden;
+  min-height: 100dvh;
 }
 
 ::selection {
@@ -57,6 +61,33 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+@layer base {
+  /* 8pt Grid Spacing Utilities */
+  .gap-1 { gap: calc(var(--space-unit) * 1); }
+  .gap-2 { gap: calc(var(--space-unit) * 2); }
+  .gap-3 { gap: calc(var(--space-unit) * 3); }
+  .gap-4 { gap: calc(var(--space-unit) * 4); }
+  .gap-5 { gap: calc(var(--space-unit) * 5); }
+  .gap-6 { gap: calc(var(--space-unit) * 6); }
+
+  .p-1 { padding: calc(var(--space-unit) * 1); }
+  .p-2 { padding: calc(var(--space-unit) * 2); }
+  .p-3 { padding: calc(var(--space-unit) * 3); }
+  .p-4 { padding: calc(var(--space-unit) * 4); }
+  .p-5 { padding: calc(var(--space-unit) * 5); }
+
+  .px-2 { padding-left: calc(var(--space-unit) * 2); padding-right: calc(var(--space-unit) * 2); }
+  .px-3 { padding-left: calc(var(--space-unit) * 3); padding-right: calc(var(--space-unit) * 3); }
+  .px-4 { padding-left: calc(var(--space-unit) * 4); padding-right: calc(var(--space-unit) * 4); }
+  .px-5 { padding-left: calc(var(--space-unit) * 5); padding-right: calc(var(--space-unit) * 5); }
+
+  .py-1 { padding-top: calc(var(--space-unit) * 1); padding-bottom: calc(var(--space-unit) * 1); }
+  .py-2 { padding-top: calc(var(--space-unit) * 2); padding-bottom: calc(var(--space-unit) * 2); }
+  .py-3 { padding-top: calc(var(--space-unit) * 3); padding-bottom: calc(var(--space-unit) * 3); }
+  .py-4 { padding-top: calc(var(--space-unit) * 4); padding-bottom: calc(var(--space-unit) * 4); }
+  .py-5 { padding-top: calc(var(--space-unit) * 5); padding-bottom: calc(var(--space-unit) * 5); }
 }
 
 @layer components {

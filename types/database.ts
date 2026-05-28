@@ -52,7 +52,6 @@ export interface Meal {
   id: string;
   user_id: string;
   started_at: string;
-  ended_at: string | null;
   ingredients: string[];
   notes: string | null;
   status: MealLogStatus;

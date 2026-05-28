@@ -57,33 +57,19 @@ export function MealForm() {
           </motion.p>
         ) : null}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label htmlFor="meal-started" className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-300">
-              <Clock className="inline h-3.5 w-3.5 ml-1" />
-              وقت البداية
-            </label>
-            <input
-              id="meal-started"
-              name="startedAt"
-              type="datetime-local"
-              defaultValue={localStart}
-              required
-              className="w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm text-slate-900 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-100 transition-all"
-            />
-          </div>
-          <div>
-            <label htmlFor="meal-ended" className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-300">
-              <Clock className="inline h-3.5 w-3.5 ml-1" />
-              وقت النهاية (اختياري)
-            </label>
-            <input
-              id="meal-ended"
-              name="endedAt"
-              type="datetime-local"
-              className="w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm text-slate-900 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-100 transition-all"
-            />
-          </div>
+        <div>
+          <label htmlFor="meal-started" className="mb-1.5 block text-sm font-medium text-slate-600 dark:text-slate-300">
+            <Clock className="inline h-3.5 w-3.5 ml-1" />
+            وقت تناول الوجبة
+          </label>
+          <input
+            id="meal-started"
+            name="startedAt"
+            type="datetime-local"
+            defaultValue={localStart}
+            required
+            className="w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm text-slate-900 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-100 transition-all"
+          />
         </div>
 
         <div>

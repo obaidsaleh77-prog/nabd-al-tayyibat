@@ -16,12 +16,16 @@ import { ComplianceGauge } from "@/components/charts/ComplianceGauge";
 import { MealForm } from "@/components/forms/MealForm";
 import { Card } from "@/components/ui/card";
 import { getTodayMeals, getTodayCompliance } from "@/app/actions/meals";
-import { formatNumberAr } from "@/lib/utils";
+import { formatNumberAr, cn } from "@/lib/utils";
 import type { ComplianceSnapshot } from "@/types/database";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export const metadata: Metadata = { title: "نبض الطيبات" };
+
+/* ثوابت الحركة المتدرجة — كل بطاقة تتأخر 80ms عن التي قبلها */
+const stagger = (i: number) => ({
+  animationDelay: `${i * 80}ms`,
+});
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -48,7 +52,6 @@ export default async function DashboardPage() {
 
   const firstName = profile?.full_name?.split(" ")[0] || "مستخدم";
 
-  const mealEmoji = (status: string) => status === "flagged" ? "⚠️" : "✅";
   const timeAgo = (d: string) => {
     const diff = Date.now() - new Date(d).getTime();
     const h = Math.floor(diff / 3600000);
@@ -57,12 +60,14 @@ export default async function DashboardPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl animate-fade-in">
-      {/* ====== الهيدر مع التزام اليوم ====== */}
-      <div className="mb-6">
+    <div className="mx-auto max-w-2xl">
+      {/* ====== 1. الهيدر — تحية + حلقة الالتزام ====== */}
+      <div className="mb-6 animate-fade-in">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-xs font-medium text-muted tracking-wide">{todayDate}</p>
+            <p className="text-xs font-medium text-muted tracking-wide">
+              {todayDate}
+            </p>
             <h1 className="text-xl font-bold text-slate-900 dark:text-white">
               مرحباً، {firstName}
             </h1>
@@ -71,108 +76,67 @@ export default async function DashboardPage() {
               <span>كيف صحتك اليوم؟</span>
             </div>
           </div>
-          <Link href="/health-status">
-            <div className="relative flex items-center justify-center">
-              <svg width="72" height="72" viewBox="0 0 72 72" className="-rotate-90">
-                <circle cx="36" cy="36" r="30" fill="none" stroke="#E8ECF0" strokeWidth="5" />
-                <circle
-                  cx="36"
-                  cy="36"
-                  r="30"
-                  fill="none"
-                  stroke="#03A5EE"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                  strokeDasharray={`${2 * Math.PI * 30 * (percent / 100)} ${2 * Math.PI * 30 * (1 - percent / 100)}`}
-                  className="transition-all duration-1000"
-                />
-              </svg>
-              <span className="absolute text-lg font-bold text-primary">{formatNumberAr(Math.round(percent))}%</span>
-            </div>
+          <Link href="/health-status" className="relative flex items-center justify-center">
+            <svg width="72" height="72" viewBox="0 0 72 72" className="-rotate-90">
+              <circle cx="36" cy="36" r="30" fill="none" stroke="#E8ECF0" strokeWidth="5" />
+              <circle
+                cx="36" cy="36" r="30"
+                fill="none" stroke="#03A5EE" strokeWidth="5"
+                strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 30 * (percent / 100)} ${2 * Math.PI * 30 * (1 - percent / 100)}`}
+                className="transition-all duration-1000"
+              />
+            </svg>
+            <span className="absolute text-lg font-bold text-primary">
+              {formatNumberAr(Math.round(percent))}%
+            </span>
           </Link>
         </div>
       </div>
 
-      {/* ====== بطاقات الإحصائيات السريعة ====== */}
+      {/* ====== 2. شبكة الإحصائيات السريعة (2×2) ====== */}
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <Link href="/meals">
-          <Card className="group relative overflow-hidden p-4 transition-all duration-200 hover:shadow-elevated active:scale-[0.97]">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary/20 to-secondary/5 text-secondary">
-                <Utensils className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs text-muted">وجبات اليوم</p>
-                <p className="text-xl font-bold text-slate-900 dark:text-white">{formatNumberAr(meals.length)}</p>
-              </div>
-            </div>
-            <div className="absolute -bottom-2 -left-2 text-6xl opacity-[0.04] select-none pointer-events-none">
-              <Utensils className="h-16 w-16" />
-            </div>
-          </Card>
-        </Link>
-
-        <Link href="/weight">
-          <Card className="group relative overflow-hidden p-4 transition-all duration-200 hover:shadow-elevated active:scale-[0.97]">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary">
-                <Scale className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs text-muted">الوزن</p>
-                <p className="text-xl font-bold text-slate-900 dark:text-white">تسجيل</p>
-              </div>
-            </div>
-            <div className="absolute -bottom-2 -left-2 text-6xl opacity-[0.04] select-none pointer-events-none">
-              <Scale className="h-16 w-16" />
-            </div>
-          </Card>
-        </Link>
-
-        <Link href="/health-status">
-          <Card className="group relative overflow-hidden p-4 transition-all duration-200 hover:shadow-elevated active:scale-[0.97]">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 text-accent">
-                <Activity className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs text-muted">الحالة الصحية</p>
-                <p className="text-xl font-bold text-slate-900 dark:text-white">صحتي</p>
-              </div>
-            </div>
-            <div className="absolute -bottom-2 -left-2 text-6xl opacity-[0.04] select-none pointer-events-none">
-              <Activity className="h-16 w-16" />
-            </div>
-          </Card>
-        </Link>
-
-        <Link href="/rules">
-          <Card className="group relative overflow-hidden p-4 transition-all duration-200 hover:shadow-elevated active:scale-[0.97]">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 text-emerald-500">
-                <Timer className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs text-muted">الدليل</p>
-                <p className="text-xl font-bold text-slate-900 dark:text-white">الغذائي</p>
-              </div>
-            </div>
-            <div className="absolute -bottom-2 -left-2 text-6xl opacity-[0.04] select-none pointer-events-none">
-              <Timer className="h-16 w-16" />
-            </div>
-          </Card>
-        </Link>
+        {[
+          { href: "/meals", label: "وجبات اليوم", value: formatNumberAr(meals.length), icon: Utensils, gradient: "from-secondary/20 to-secondary/5", color: "text-secondary" },
+          { href: "/weight", label: "الوزن", value: "تسجيل", icon: Scale, gradient: "from-primary/20 to-primary/5", color: "text-primary" },
+          { href: "/health-status", label: "الحالة الصحية", value: "صحتي", icon: Activity, gradient: "from-accent/20 to-accent/5", color: "text-accent" },
+          { href: "/rules", label: "الدليل الغذائي", value: "التفاصيل", icon: Timer, gradient: "from-emerald-500/20 to-emerald-500/5", color: "text-emerald-500" },
+        ].map((item, i) => {
+          const Icon = item.icon;
+          return (
+            <Link key={item.href} href={item.href}>
+              <Card
+                className="group relative overflow-hidden p-4 transition-all duration-200 active:scale-[0.97] animate-slide-up"
+                style={stagger(i)}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} ${item.color}`}>
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted">{item.label}</p>
+                    <p className="text-xl font-bold text-slate-900 dark:text-white">{item.value}</p>
+                  </div>
+                </div>
+                <div className="absolute -bottom-2 -left-2 opacity-[0.04] select-none pointer-events-none">
+                  <Icon className="h-16 w-16" />
+                </div>
+              </Card>
+            </Link>
+          );
+        })}
       </div>
 
-      {/* ====== المحتوى الرئيسي: رسم الالتزام + الوجبات ====== */}
+      {/* ====== 3. رسم الالتزام + وجبات اليوم ====== */}
       <div className="grid gap-5 md:grid-cols-2 mb-6">
-        <ComplianceGauge
-          percent={Math.round(percent)}
-          snapshot={compliance as ComplianceSnapshot | null}
-        />
+        <div className="animate-slide-up" style={stagger(4)}>
+          <ComplianceGauge
+            percent={Math.round(percent)}
+            snapshot={compliance as ComplianceSnapshot | null}
+          />
+        </div>
 
-        {/* ====== وجبات اليوم — تصميم Timeline ====== */}
-        <Card className="p-5">
+        <Card className="p-5 animate-slide-up" style={stagger(5)}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -198,16 +162,13 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <div className="relative">
-              {/* الخط العمودي للـ timeline */}
               <div className="absolute right-[17px] top-2 bottom-2 w-0.5 bg-slate-100 dark:bg-slate-800 rounded-full" />
-
               <ul className="space-y-0">
                 {meals.slice(0, 4).map((m, idx) => {
                   const ingredients = Array.isArray(m.ingredients) ? (m.ingredients as string[]) : [];
                   const isFlagged = m.status === "flagged";
                   return (
                     <li key={m.id} className="relative flex items-start gap-4 pb-4 last:pb-0">
-                      {/* نقطة التوقيت */}
                       <div className={cn(
                         "relative z-10 mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold",
                         isFlagged
@@ -216,14 +177,10 @@ export default async function DashboardPage() {
                       )}>
                         {isFlagged ? "!" : "✓"}
                       </div>
-
                       <div className="min-w-0 flex-1 pt-0.5">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
-                            {new Date(m.started_at).toLocaleTimeString("ar-SA", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            {new Date(m.started_at).toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" })}
                           </span>
                           <span className="text-[10px] text-muted/60">{timeAgo(m.started_at)}</span>
                         </div>
@@ -249,8 +206,8 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      {/* ====== نصيحة اليوم ====== */}
-      <Card className="relative overflow-hidden p-5 gradient-health text-white shadow-lg shadow-primary/20 mb-6">
+      {/* ====== 4. نصيحة اليوم ====== */}
+      <Card className="relative overflow-hidden p-5 gradient-health text-white shadow-lg shadow-primary/20 mb-6 animate-slide-up" style={stagger(6)}>
         <div className="absolute -bottom-6 -left-6 opacity-10">
           <Sparkles className="h-32 w-32" />
         </div>
@@ -278,8 +235,8 @@ export default async function DashboardPage() {
         </div>
       </Card>
 
-      {/* ====== إضافة وجبة سريعة ====== */}
-      <Card className="p-5">
+      {/* ====== 5. إضافة وجبة — في الأسفل قريب من الـ Bottom Bar ====== */}
+      <Card className="p-5 animate-slide-up" style={stagger(7)}>
         <div className="flex items-center gap-2 mb-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
             <Apple className="h-4 w-4" />
