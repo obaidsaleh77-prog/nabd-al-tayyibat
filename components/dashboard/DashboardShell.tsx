@@ -326,7 +326,7 @@ export function DashboardShellClient({ children, enabledFlags = {}, isAdmin, use
           </button>
           <div className="flex items-center gap-2">
             <AppLogo size={26} showText={false} />
-            <span className="bg-gradient-to-l from-[#6B4EE6] to-[#8B7EF5] bg-clip-text text-sm font-bold text-transparent">
+            <span className="bg-gradient-to-l from-[#4C34B8] to-[#7B6BF0] bg-clip-text text-sm font-bold text-transparent leading-tight pt-0.5">
               نبض الطيبات
             </span>
           </div>

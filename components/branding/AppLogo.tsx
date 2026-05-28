@@ -9,7 +9,7 @@ export interface AppLogoProps {
   title?: string;
 }
 
-/** شعار نبض الطيبات — أيقونة بنفسجية + حرف "ن" جريء + ECG بارز */
+/** شعار نبض الطيبات — أيقونة بنفسجية غامقة + حرف "ن" جريء + ECG بارز */
 export function AppLogo({
   size = 48,
   showText = true,
@@ -36,15 +36,15 @@ export function AppLogo({
       >
         <defs>
           <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#6B4EE6" />
-            <stop offset="100%" stopColor="#8B7EF5" />
+            <stop offset="0%" stopColor="#4C34B8" />
+            <stop offset="100%" stopColor="#7B6BF0" />
           </linearGradient>
         </defs>
 
-        {/* ظل سادة — بديل آمن عن feDropShadow */}
-        <rect x="2" y="5" width="60" height="60" rx="18" fill="#6B4EE6" opacity="0.15" />
+        {/* ظل سادة */}
+        <rect x="2" y="5" width="60" height="60" rx="18" fill="#3E2A9C" opacity="0.2" />
 
-        {/* خلفية دائريّة ناعمة مع تدرج بنفسجي */}
+        {/* خلفية دائريّة مع تدرج بنفسجي غامق */}
         <rect x="2" y="2" width="60" height="60" rx="18" fill="url(#logoGrad)" />
 
         {/* حرف "ن" بخط جريء وعصري */}
@@ -98,11 +98,11 @@ export function AppLogo({
       </svg>
 
       {showText ? (
-        <div className="flex flex-col leading-none">
-          <span className="bg-gradient-to-l from-[#6B4EE6] to-[#8B7EF5] bg-clip-text text-lg font-bold text-transparent">
+        <div className="flex flex-col leading-tight pt-0.5">
+          <span className="bg-gradient-to-l from-[#4C34B8] to-[#7B6BF0] bg-clip-text text-base font-bold text-transparent">
             نبض
           </span>
-          <span className="text-[11px] font-semibold text-slate-400 -mt-0.5">
+          <span className="text-[10px] font-semibold text-slate-400 -mt-0.5">
             الطيبات
           </span>
         </div>
