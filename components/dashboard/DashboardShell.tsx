@@ -17,12 +17,13 @@ import {
   Menu,
   X,
   Shield,
-  ChevronLeft,
-  HelpCircle,
+  Plus,
 } from "lucide-react";
 import { useState } from "react";
 import { AppLogo } from "@/components/branding/AppLogo";
 import { Button } from "@/components/ui/button";
+import { BottomSheet } from "@/components/ui/BottomSheet";
+import { MealForm } from "@/components/forms/MealForm";
 import { signOutAction } from "@/app/actions/auth";
 import { cn } from "@/lib/utils";
 
@@ -95,7 +96,16 @@ function NavLinks({ enabledFlags = {}, isAdmin, onClose }: { enabledFlags?: Reco
   );
 }
 
-function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<string, boolean>; isAdmin?: boolean }) {
+/* ───── شريط التنقل السفلي مع FAB لإضافة وجبة ───── */
+function BottomNav({
+  enabledFlags = {},
+  isAdmin,
+  onAddMeal,
+}: {
+  enabledFlags?: Record<string, boolean>;
+  isAdmin?: boolean;
+  onAddMeal: () => void;
+}) {
   const pathname = usePathname();
 
   const items = [
@@ -164,13 +174,16 @@ function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<strin
             );
           })}
 
-          <Link
-            href="/camera"
-            className="absolute left-1/2 -translate-x-1/2 z-20"
+          {/* FAB الأوسط — إضافة وجبة سريعة */}
+          <button
+            type="button"
+            onClick={onAddMeal}
+            className="absolute left-1/2 -translate-x-1/2 z-20 cursor-pointer"
             style={{ top: -32 }}
+            aria-label="إضافة وجبة"
           >
             <motion.div
-              className="flex items-center justify-center rounded-full shadow-fab"
+              className="relative flex items-center justify-center rounded-full shadow-fab"
               style={{
                 width: 58,
                 height: 58,
@@ -181,14 +194,19 @@ function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<strin
               whileTap={{ scale: 0.92 }}
               transition={fabSpring}
             >
-              <motion.div
-                animate={{ rotate: [0, -8, 8, 0] }}
-                transition={{ repeat: Infinity, repeatDelay: 6, duration: 1.2, ease: "easeInOut" }}
-              >
-                <Camera className="text-white" style={{ width: 26, height: 26 }} aria-hidden="true" />
-              </motion.div>
+              {/* حلقة نبض خارجية */}
+              <motion.span
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: "linear-gradient(135deg, #03A5EE, #0E8BC4)",
+                  opacity: 0.3,
+                }}
+                animate={{ scale: [1, 1.25, 1], opacity: [0.3, 0, 0.3] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <Plus className="text-white relative z-10" style={{ width: 28, height: 28 }} aria-hidden="true" />
             </motion.div>
-          </Link>
+          </button>
         </div>
       </div>
     </nav>
@@ -199,6 +217,7 @@ const springTransition = { type: "spring", stiffness: 300, damping: 30 };
 
 export function DashboardShellClient({ children, enabledFlags, isAdmin }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mealSheetOpen, setMealSheetOpen] = useState(false);
 
   return (
     <div className="flex min-h-[100dvh] bg-surface dark:bg-surface-dark">
@@ -225,7 +244,6 @@ export function DashboardShellClient({ children, enabledFlags, isAdmin }: Dashbo
 
       {/* ====== Main Area ====== */}
       <div className="flex flex-1 flex-col lg:mr-0 min-h-[100dvh]">
-
         {/* ====== Mobile Header ====== */}
         <header className="sticky top-0 z-40 flex h-14 items-center gap-3 bg-white/80 dark:bg-slate-900/80 border-b border-border dark:border-slate-800 px-4 backdrop-blur-2xl safe-top lg:hidden">
           <button
@@ -294,7 +312,12 @@ export function DashboardShellClient({ children, enabledFlags, isAdmin }: Dashbo
         </main>
       </div>
 
-      <BottomNav enabledFlags={enabledFlags} isAdmin={isAdmin} />
+      <BottomNav enabledFlags={enabledFlags} isAdmin={isAdmin} onAddMeal={() => setMealSheetOpen(true)} />
+
+      {/* ====== Bottom Sheet — إضافة وجبة ====== */}
+      <BottomSheet open={mealSheetOpen} onClose={() => setMealSheetOpen(false)} title="إضافة وجبة جديدة">
+        <MealForm />
+      </BottomSheet>
     </div>
   );
 }

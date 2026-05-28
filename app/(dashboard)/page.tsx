@@ -11,9 +11,9 @@ import {
   Apple,
   Flame,
   Droplets,
+  Plus,
 } from "lucide-react";
 import { ComplianceGauge } from "@/components/charts/ComplianceGauge";
-import { MealForm } from "@/components/forms/MealForm";
 import { Card } from "@/components/ui/card";
 import { getTodayMeals, getTodayCompliance } from "@/app/actions/meals";
 import { formatNumberAr, cn } from "@/lib/utils";
@@ -235,16 +235,13 @@ export default async function DashboardPage() {
         </div>
       </Card>
 
-      {/* ====== 5. إضافة وجبة — في الأسفل قريب من الـ Bottom Bar ====== */}
-      <Card className="p-5 animate-slide-up" style={stagger(7)}>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
-            <Apple className="h-4 w-4" />
-          </div>
-          <h2 className="text-sm font-bold text-slate-800 dark:text-white">إضافة وجبة</h2>
+      {/* ====== 5. دعوة لاستخدام الزر العائم — تختفي لوحدها ====== */}
+      <div className="flex items-center justify-center gap-2 pb-4 animate-slide-up" style={stagger(7)}>
+        <div className="flex items-center gap-2 rounded-2xl bg-primary/5 px-4 py-3 text-xs text-muted">
+          <Plus className="h-4 w-4 text-primary" />
+          <span>اضغط الزر الأزرق في الأسفل لإضافة وجبة</span>
         </div>
-        <MealForm />
-      </Card>
+      </div>
     </div>
   );
 }
