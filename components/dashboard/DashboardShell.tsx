@@ -357,9 +357,7 @@ export function DashboardShellClient({ children, enabledFlags = {}, isAdmin, use
                 {/* ── الرأس: الشعار + اسم المستخدم + زر الإغلاق ── */}
                 <header className="flex shrink-0 items-center justify-between px-5 pt-5 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#6B4EE6] to-[#8B7EF5] text-white shadow-sm shadow-[#6B4EE6]/20">
-                      <span className="text-sm font-bold">ن</span>
-                    </div>
+                    <AppLogo size={40} showText={false} />
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-slate-800">نبض الطيبات</span>
                       {userName ? (
