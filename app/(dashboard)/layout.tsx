@@ -24,13 +24,15 @@ export default async function DashboardLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, full_name")
     .eq("id", user.id)
     .single();
 
   const isAdmin = profile?.role === "admin";
+  const userName = profile?.full_name ?? null;
+  const userEmail = user.email ?? null;
 
   return (
-    <DashboardShellClient enabledFlags={enabledFlags} isAdmin={isAdmin}>{children}</DashboardShellClient>
+    <DashboardShellClient enabledFlags={enabledFlags} isAdmin={isAdmin} userName={userName} userEmail={userEmail}>{children}</DashboardShellClient>
   );
 }

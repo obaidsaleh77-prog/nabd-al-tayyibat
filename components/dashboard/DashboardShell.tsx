@@ -49,6 +49,8 @@ interface DashboardShellProps {
   children: React.ReactNode;
   enabledFlags?: Record<string, boolean>;
   isAdmin?: boolean;
+  userName?: string | null;
+  userEmail?: string | null;
 }
 
 function NavLinks({ enabledFlags = {}, isAdmin, onClose }: { enabledFlags?: Record<string, boolean>; isAdmin?: boolean; onClose?: () => void }) {
@@ -229,10 +231,64 @@ function BottomNav({
   );
 }
 
+/* ───── مكونات القائمة المتنقلة المنظمة ───── */
+function MenuSection({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <span className="block px-4 pb-1.5 text-[11px] font-bold text-slate-400 tracking-wider">
+        {label}
+      </span>
+      <div className="flex flex-col gap-0.5">{children}</div>
+    </div>
+  );
+}
+
+function MenuItem({
+  href,
+  icon: Icon,
+  label,
+  pathname,
+  onClose,
+}: {
+  href: string;
+  icon: typeof LayoutDashboard;
+  label: string;
+  pathname: string;
+  onClose: () => void;
+}) {
+  const active = pathname === href;
+  return (
+    <Link
+      href={href}
+      onClick={onClose}
+      className={cn(
+        "group flex items-center gap-3 rounded-2xl px-4 py-2.5 transition-all duration-150",
+        active
+          ? "bg-[#6B4EE6]/10 text-[#6B4EE6]"
+          : "text-slate-600 hover:bg-slate-50"
+      )}
+      aria-current={active ? "page" : undefined}
+    >
+      <div
+        className={cn(
+          "flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-150",
+          active
+            ? "bg-[#6B4EE6] text-white shadow-sm shadow-[#6B4EE6]/20"
+            : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
+        )}
+      >
+        <Icon className="h-4.5 w-4.5" strokeWidth={1.5} aria-hidden="true" />
+      </div>
+      <span className="text-sm font-medium">{label}</span>
+    </Link>
+  );
+}
+
 const springTransition = { type: "spring", stiffness: 300, damping: 30 };
 
-export function DashboardShellClient({ children, enabledFlags, isAdmin }: DashboardShellProps) {
+export function DashboardShellClient({ children, enabledFlags = {}, isAdmin, userName, userEmail }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div className="flex min-h-[100dvh] bg-surface dark:bg-surface-dark">
@@ -274,41 +330,103 @@ export function DashboardShellClient({ children, enabledFlags, isAdmin }: Dashbo
           </div>
         </header>
 
-        {/* ====== Mobile Drawer ====== */}
+        {/* ====== Mobile Overlay Menu ====== */}
         <AnimatePresence>
           {sidebarOpen && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.12 }}
-              className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm lg:hidden"
+              transition={{ duration: 0.18 }}
+              className="fixed inset-0 z-50 lg:hidden"
+              style={{ backgroundColor: "rgba(0,0,0,0.45)" }}
               onClick={() => setSidebarOpen(false)}
             >
+              {/* اللوحة — منزلقة من اليمين (RTL) */}
               <motion.aside
-                initial={{ x: -280 }}
+                initial={{ x: 300 }}
                 animate={{ x: 0 }}
-                exit={{ x: -280 }}
-                transition={springTransition}
+                exit={{ x: 300 }}
+                transition={{ type: "spring", stiffness: 380, damping: 34 }}
                 onClick={(e) => e.stopPropagation()}
-                className="absolute right-0 top-0 bottom-0 w-[270px] bg-white dark:bg-slate-900 shadow-elevated"
+                className="absolute left-0 top-0 bottom-0 flex w-[290px] max-w-[85vw] flex-col bg-white shadow-elevated"
+                style={{ direction: "rtl" }}
               >
-                <div className="flex h-14 items-center px-5 border-b border-border dark:border-slate-800">
-                  <AppLogo size={26} />
+                {/* ── الرأس: الشعار + اسم المستخدم + زر الإغلاق ── */}
+                <header className="flex shrink-0 items-center justify-between px-5 pt-5 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#6B4EE6] to-[#8B7EF5] text-white shadow-sm shadow-[#6B4EE6]/20">
+                      <span className="text-sm font-bold">ن</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-800">نبض الطيبات</span>
+                      {userName ? (
+                        <span className="text-[11px] font-medium text-muted">{userName}</span>
+                      ) : null}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSidebarOpen(false)}
+                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition-all hover:bg-slate-200 active:scale-90"
+                    aria-label="إغلاق القائمة"
+                  >
+                    <X className="h-4 w-4" strokeWidth={1.5} />
+                  </button>
+                </header>
+
+                {/* ── المحتوى القابل للتمرير ── */}
+                <div className="flex-1 overflow-y-auto overscroll-contain px-3 pb-4">
+                  <nav className="flex flex-col gap-6" aria-label="القائمة الرئيسية">
+                    {/* ⋆ المجموعة 1: الرئيسية ⋆ */}
+                    <MenuSection label="التصفح الرئيسي">
+                      <MenuItem href="/" icon={LayoutDashboard} label="الرئيسية" pathname={pathname} onClose={() => setSidebarOpen(false)} />
+                      <MenuItem href="/health-status" icon={Activity} label="الإحصائيات" pathname={pathname} onClose={() => setSidebarOpen(false)} />
+                    </MenuSection>
+
+                    {/* ⋆ المجموعة 2: الوجبات والصحة ⋆ */}
+                    <MenuSection label="الوجبات والصحة">
+                      <MenuItem href="/meals" icon={Utensils} label="الوجبات" pathname={pathname} onClose={() => setSidebarOpen(false)} />
+                      <MenuItem href="/weight" icon={Scale} label="الوزن" pathname={pathname} onClose={() => setSidebarOpen(false)} />
+                      <MenuItem href="/rules" icon={ClipboardList} label="الدليل الغذائي" pathname={pathname} onClose={() => setSidebarOpen(false)} />
+                    </MenuSection>
+
+                    {/* ⋆ المجموعة 3: المساعدات الذكية ⋆ */}
+                    {enabledFlags.ai_chat !== false && (
+                      <MenuSection label="المساعدات الذكية">
+                        <MenuItem href="/ai-chat" icon={MessageCircle} label="اسألني" pathname={pathname} onClose={() => setSidebarOpen(false)} />
+                        <MenuItem href="/camera" icon={Camera} label="الماسح الضوئي" pathname={pathname} onClose={() => setSidebarOpen(false)} />
+                        {enabledFlags.blog !== false && (
+                          <MenuItem href="/blog" icon={BookOpen} label="المدونة" pathname={pathname} onClose={() => setSidebarOpen(false)} />
+                        )}
+                      </MenuSection>
+                    )}
+
+                    {/* ⋆ المجموعة 4: الحساب والعام ⋆ */}
+                    <MenuSection label="الحساب والعام">
+                      <MenuItem href="/settings" icon={Settings} label="الإعدادات" pathname={pathname} onClose={() => setSidebarOpen(false)} />
+                      <MenuItem href="/disclaimer" icon={Shield} label="سياسة الخصوصية" pathname={pathname} onClose={() => setSidebarOpen(false)} />
+                      {isAdmin && (
+                        <MenuItem href="/admin" icon={Shield} label="لوحة الإدارة" pathname={pathname} onClose={() => setSidebarOpen(false)} />
+                      )}
+                    </MenuSection>
+                  </nav>
                 </div>
-                <div className="overflow-y-auto px-3 py-5">
-                  <NavLinks enabledFlags={enabledFlags} isAdmin={isAdmin} onClose={() => setSidebarOpen(false)} />
-                </div>
-                <div className="px-3 py-4 border-t border-border dark:border-slate-800">
+
+                {/* ── تذييل: تسجيل الخروج + الإصدار ── */}
+                <div className="shrink-0 border-t border-border px-3 pt-3 pb-5 safe-bottom">
                   <form action={signOutAction}>
                     <button
                       type="submit"
-                      className="flex w-full items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
+                      className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-red-500 transition-all duration-150 hover:bg-red-50 active:scale-[0.97]"
                     >
-                      <LogOut className="h-4 w-4" />
-                      تسجيل الخروج
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-50 text-red-500">
+                        <LogOut className="h-4 w-4" strokeWidth={1.5} />
+                      </div>
+                      <span>تسجيل الخروج</span>
                     </button>
                   </form>
+                  <p className="mt-3 text-center text-[10px] text-slate-300 font-medium">نبض الطيبات · v1.0.0</p>
                 </div>
               </motion.aside>
             </motion.div>
