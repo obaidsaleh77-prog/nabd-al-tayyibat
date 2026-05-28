@@ -53,7 +53,9 @@ export default async function BlogArticlePage({ params }: Props) {
 
   if (!post) notFound();
 
-  const content = post.content as BlogContent;
+  const raw = post.content;
+  const content: BlogContent =
+    typeof raw === "string" ? (JSON.parse(raw) as BlogContent) : (raw as BlogContent);
 
   return (
     <div className="mx-auto max-w-3xl animate-fade-in">

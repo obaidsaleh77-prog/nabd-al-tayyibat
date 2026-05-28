@@ -90,7 +90,12 @@ export async function saveBlogPostAction(
 
   let content: Record<string, unknown> = {};
   try {
-    content = JSON.parse(String(formData.get("content") || "{}")) as Record<string, unknown>;
+    const raw = String(formData.get("content") || "{}");
+    content = JSON.parse(raw) as Record<string, unknown>;
+    // Ensure content is always an object (not a string, array, etc.)
+    if (typeof content !== "object" || content === null || Array.isArray(content)) {
+      content = {};
+    }
   } catch {
     return { error: "محتوى JSON غير صالح" };
   }
