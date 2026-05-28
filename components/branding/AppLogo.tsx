@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export interface AppLogoProps {
@@ -10,7 +9,7 @@ export interface AppLogoProps {
   title?: string;
 }
 
-/** شعار نبض الطيبات — أيقونة بنفسجية مع حرف "ن" و ECG بارز */
+/** شعار نبض الطيبات — أيقونة بنفسجية + حرف "ن" جريء + ECG بارز */
 export function AppLogo({
   size = 48,
   showText = true,
@@ -18,7 +17,7 @@ export function AppLogo({
   title = "نبض الطيبات",
 }: AppLogoProps) {
   const p = size;
-  const strokeW = Math.round(p * 0.047);
+  const strokeW = Math.max(Math.round(p * 0.047), 2);
 
   return (
     <div
@@ -40,43 +39,39 @@ export function AppLogo({
             <stop offset="0%" stopColor="#6B4EE6" />
             <stop offset="100%" stopColor="#8B7EF5" />
           </linearGradient>
-          <filter id="logoShadow">
-            <feDropShadow dx="0" dy="3" stdDeviation="6" floodColor="#6B4EE6" floodOpacity="0.25" />
-          </filter>
         </defs>
 
-        {/* خلفية دائريّة ناعمة مع تدرج بنفسجي + ظل أعمق */}
-        <rect
-          x="2" y="2" width="60" height="60" rx="18"
-          fill="url(#logoGrad)"
-          filter="url(#logoShadow)"
-        />
+        {/* ظل سادة — بديل آمن عن feDropShadow */}
+        <rect x="2" y="5" width="60" height="60" rx="18" fill="#6B4EE6" opacity="0.15" />
+
+        {/* خلفية دائريّة ناعمة مع تدرج بنفسجي */}
+        <rect x="2" y="2" width="60" height="60" rx="18" fill="url(#logoGrad)" />
 
         {/* حرف "ن" بخط جريء وعصري */}
         <path
-          d="M15 40V20h12l7 12V20h10v20h-10l-7-12v12h-6z"
+          d="M17 38V22h10l6 10V22h8v16h-8l-6-10v10h-10z"
           fill="white"
           opacity="0.95"
         />
 
-        {/* نقطة فوق حرف النون — أكبر قليلاً للوضوح */}
-        <circle cx="23" cy="18" r="2.5" fill="white" opacity="0.9" />
+        {/* نقطة فوق حرف النون */}
+        <circle cx="24" cy="20" r="2.5" fill="white" opacity="0.9" />
 
-        {/* خط ECG بنسبة تباين أعلى */}
-        <g transform="translate(2, 0)">
+        {/* خط ECG — متحرك عبر animate */}
+        <g transform="translate(2, 8)">
           <path
-            d="M0 42 L12 42 L15 32 L18 52 L21 28 L24 46 L27 34 L30 42 L46 42"
+            d="M0 34 L12 34 L15 24 L18 44 L21 20 L24 38 L27 26 L30 34 L46 34"
             stroke="white"
-            strokeWidth={strokeW + 0.5}
+            strokeWidth={strokeW}
             strokeLinecap="round"
             strokeLinejoin="round"
             fill="none"
             opacity="0.2"
           />
           <path
-            d="M0 42 L12 42 L15 32 L18 52 L21 28 L24 46 L27 34 L30 42 L46 42"
+            d="M0 34 L12 34 L15 24 L18 44 L21 20 L24 38 L27 26 L30 34 L46 34"
             stroke="white"
-            strokeWidth={strokeW + 0.5}
+            strokeWidth={strokeW}
             strokeLinecap="round"
             strokeLinejoin="round"
             fill="none"
@@ -88,12 +83,10 @@ export function AppLogo({
               attributeName="stroke-dashoffset"
               from="80" to="0"
               dur="1.8s"
-              begin="0s"
-              fill="freeze"
               repeatCount="indefinite"
             />
           </path>
-          <circle cx="46" cy="42" r={strokeW * 1.5} fill="white" opacity="0.95">
+          <circle cx="46" cy="34" r={strokeW * 1.5} fill="white" opacity="0.95">
             <animate
               attributeName="opacity"
               values="0.95;0.3;0.95"
