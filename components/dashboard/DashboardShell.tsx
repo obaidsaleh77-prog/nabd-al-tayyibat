@@ -330,7 +330,7 @@ export function DashboardShellClient({ children, enabledFlags = {}, isAdmin, use
           </div>
         </header>
 
-        {/* ====== Mobile Overlay Menu ====== */}
+        {/* ====== Mobile Overlay Menu — فوق كل شيء ====== */}
         <AnimatePresence>
           {sidebarOpen && (
             <motion.div
@@ -338,18 +338,18 @@ export function DashboardShellClient({ children, enabledFlags = {}, isAdmin, use
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
-              className="fixed inset-0 z-50 lg:hidden"
+              className="fixed inset-0 z-[60] lg:hidden"
               style={{ backgroundColor: "rgba(0,0,0,0.45)" }}
               onClick={() => setSidebarOpen(false)}
             >
-              {/* اللوحة — منزلقة من اليمين (RTL) */}
+              {/* اللوحة — منزلقة من اليمين مع RTL */}
               <motion.aside
-                initial={{ x: 300 }}
+                initial={{ x: "100%" }}
                 animate={{ x: 0 }}
-                exit={{ x: 300 }}
+                exit={{ x: "100%" }}
                 transition={{ type: "spring", stiffness: 380, damping: 34 }}
                 onClick={(e) => e.stopPropagation()}
-                className="absolute left-0 top-0 bottom-0 flex w-[290px] max-w-[85vw] flex-col bg-white shadow-elevated"
+                className="absolute top-0 bottom-0 right-0 flex w-[290px] max-w-[85vw] flex-col bg-white shadow-elevated"
                 style={{ direction: "rtl" }}
               >
                 {/* ── الرأس: الشعار + اسم المستخدم + زر الإغلاق ── */}
