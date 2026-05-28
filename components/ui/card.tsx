@@ -5,13 +5,15 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   glass?: boolean;
   noPad?: boolean;
+  hover?: boolean;
 }
 
-export function Card({ className, children, glass, noPad, ...props }: CardProps) {
+export function Card({ className, children, glass, noPad, hover = true, ...props }: CardProps) {
   return (
     <div
       className={cn(
-        "rounded-2xl bg-white shadow-card dark:bg-slate-800 dark:shadow-card-dark",
+        "rounded-2xl bg-white shadow-card dark:bg-slate-800 dark:shadow-card-dark transition-all duration-200",
+        hover && "hover:shadow-elevated active:scale-[0.98]",
         !noPad && "p-5",
         glass && "glass",
         className

@@ -10,17 +10,17 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#0EA5E9",
-          50: "#F0F9FF",
-          100: "#E0F2FE",
-          200: "#BAE6FD",
-          300: "#7DD3FC",
-          400: "#38BDF8",
-          500: "#0EA5E9",
-          600: "#0284C7",
-          700: "#0369A1",
-          800: "#075985",
-          900: "#0C4A6E",
+          DEFAULT: "#03A5EE",
+          50: "#EFF8FF",
+          100: "#DEF1FF",
+          200: "#B6E5FF",
+          300: "#75D1FF",
+          400: "#2CB9FF",
+          500: "#03A5EE",
+          600: "#0084CC",
+          700: "#0069A5",
+          800: "#005888",
+          900: "#064971",
         },
         secondary: {
           DEFAULT: "#10B981",
@@ -42,7 +42,7 @@ const config: Config = {
           500: "#F59E0B",
           600: "#D97706",
         },
-        surface: "#F8FAFC",
+        surface: "#F5F7FA",
         "surface-dark": "#0F172A",
         muted: "#94A3B8",
       },
@@ -56,10 +56,18 @@ const config: Config = {
       },
       boxShadow: {
         soft: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06)",
-        card: "0 4px 16px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.02)",
-        elevated: "0 8px 32px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.03)",
-        "card-dark": "0 4px 16px rgba(0,0,0,0.15)",
-        button: "0 2px 8px rgba(14,165,233,0.25)",
+        card: "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.02)",
+        elevated: "0 12px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.03)",
+        "card-dark": "0 4px 20px rgba(0,0,0,0.2)",
+        button: "0 2px 12px rgba(3,165,238,0.3)",
+        "button-warm": "0 2px 12px rgba(245,158,11,0.3)",
+        "fab": "0 8px 32px rgba(3,165,238,0.35), 0 2px 8px rgba(3,165,238,0.2)",
+      },
+      height: {
+        screen: "100dvh",
+      },
+      minHeight: {
+        screen: "100dvh",
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-out",
@@ -67,6 +75,8 @@ const config: Config = {
         "slide-down": "slideDown 0.3s ease-out",
         "scale-in": "scaleIn 0.2s ease-out",
         "pulse-soft": "pulseSoft 2s ease-in-out infinite",
+        "float": "float 3s ease-in-out infinite",
+        "glow": "glow 2s ease-in-out infinite alternate",
       },
       keyframes: {
         fadeIn: {
@@ -88,6 +98,14 @@ const config: Config = {
         pulseSoft: {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.7" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-6px)" },
+        },
+        glow: {
+          "0%": { boxShadow: "0 0 8px rgba(3,165,238,0.2)" },
+          "100%": { boxShadow: "0 0 20px rgba(3,165,238,0.4)" },
         },
       },
     },

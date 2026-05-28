@@ -17,10 +17,11 @@ import {
   Menu,
   X,
   Shield,
+  ChevronLeft,
+  HelpCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { AppLogo } from "@/components/branding/AppLogo";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { signOutAction } from "@/app/actions/auth";
 import { cn } from "@/lib/utils";
@@ -52,11 +53,11 @@ interface DashboardShellProps {
   isAdmin?: boolean;
 }
 
-function NavLinks({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<string, boolean>; isAdmin?: boolean }) {
+function NavLinks({ enabledFlags = {}, isAdmin, onClose }: { enabledFlags?: Record<string, boolean>; isAdmin?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-col gap-1" aria-label="التنقل الرئيسي">
+    <nav className="flex flex-col gap-0.5" aria-label="التنقل الرئيسي">
       {NAV_ITEMS.map((item) => {
         if (item.flag && enabledFlags[item.flag] === false) return null;
         if (item.adminOnly && !isAdmin) return null;
@@ -66,20 +67,21 @@ function NavLinks({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<string
           <Link
             key={item.href}
             href={item.href}
+            onClick={onClose}
             className={cn(
-              "group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all duration-200",
+              "group flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-medium transition-all duration-150",
               active
                 ? "bg-primary/10 text-primary"
                 : "text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50",
-              item.adminOnly && "border-t border-slate-100 dark:border-slate-800 mt-2 pt-3"
+              item.adminOnly && "border-t border-slate-100 dark:border-slate-800 mt-3 pt-4"
             )}
             aria-current={active ? "page" : undefined}
           >
             <div
               className={cn(
-                "flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200",
+                "flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-150",
                 active
-                  ? "bg-primary text-white shadow-md shadow-primary/20"
+                  ? "bg-primary text-white shadow-sm shadow-primary/20"
                   : "bg-slate-100 text-slate-400 group-hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:group-hover:bg-slate-700"
               )}
             >
@@ -108,16 +110,11 @@ function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<strin
   const fabSpring = { type: "spring" as const, stiffness: 400, damping: 25 };
 
   return (
-    <nav
-      className="fixed bottom-0 inset-x-0 z-50 lg:hidden"
-      aria-label="التنقل السفلي"
-    >
-      {/* الهيكل الخارجي — بار عائم مع ظل وتأثير زجاجي */}
+    <nav className="fixed bottom-0 inset-x-0 z-50 lg:hidden" aria-label="التنقل السفلي">
       <div
-        className="relative mx-3 mb-3 rounded-[28px] shadow-[0_-4px_30px_rgba(3,165,238,0.25)] backdrop-blur-2xl"
-        style={{ height: 68, backgroundColor: "#03A5EE" }}
+        className="relative mx-3 mb-2 rounded-[28px] shadow-[0_-4px_30px_rgba(3,165,238,0.2)] backdrop-blur-2xl"
+        style={{ height: 64, backgroundColor: "#03A5EE" }}
       >
-        {/* عناصر التنقل — شبكة 5 أعمدة */}
         <div className="relative grid h-full w-full grid-cols-5 items-center">
           {items.map((item, i) => {
             const Icon = item.icon;
@@ -127,19 +124,14 @@ function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<strin
               <Link
                 key={item.href}
                 href={item.href}
-                className="relative flex flex-col items-center justify-end pb-2"
+                className="relative flex flex-col items-center justify-end pb-1.5"
                 style={{ gridColumnStart: col, gridRowStart: 1 }}
               >
-                {/* الـ active pill — دائرة بيضاء ناعمة مع ظل */}
                 {active ? (
                   <motion.div
                     layoutId="nav-pill"
                     className="absolute rounded-2xl bg-white shadow-sm"
-                    style={{
-                      width: 44,
-                      height: 32,
-                      top: -14,
-                    }}
+                    style={{ width: 40, height: 28, top: -10 }}
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 ) : null}
@@ -148,28 +140,23 @@ function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<strin
                   className="relative z-10 flex items-center justify-center"
                   initial={false}
                   animate={{
-                    scale: active ? 1.05 : 0.9,
-                    y: active ? -8 : -2,
+                    scale: active ? 1.05 : 0.85,
+                    y: active ? -6 : -1,
                   }}
                   transition={{ type: "spring", stiffness: 400, damping: 22 }}
                 >
                   <Icon
-                    className={cn(
-                      "transition-colors duration-150",
-                      active ? "text-[#03A5EE]" : "text-white"
-                    )}
-                    style={{ width: active ? 24 : 22, height: active ? 24 : 22 }}
+                    className={cn("transition-colors duration-150", active ? "text-[#03A5EE]" : "text-white/90")}
+                    style={{ width: active ? 22 : 20, height: active ? 22 : 20 }}
                     aria-hidden="true"
                   />
                 </motion.div>
                 <span
                   className={cn(
                     "relative z-10 leading-tight transition-all duration-150",
-                    active
-                      ? "text-white font-bold"
-                      : "text-white/55 font-medium"
+                    active ? "text-white font-bold" : "text-white/55 font-medium"
                   )}
-                  style={{ fontSize: 10, marginTop: active ? 4 : 6 }}
+                  style={{ fontSize: 9, marginTop: active ? 3 : 5 }}
                 >
                   {item.label}
                 </span>
@@ -177,34 +164,28 @@ function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<strin
             );
           })}
 
-          {/* الزر العائم الأوسط — الكاميرا بتصميم مرتفع */}
           <Link
             href="/camera"
             className="absolute left-1/2 -translate-x-1/2 z-20"
-            style={{ top: -36 }}
+            style={{ top: -32 }}
           >
             <motion.div
-              className="flex items-center justify-center rounded-full"
+              className="flex items-center justify-center rounded-full shadow-fab"
               style={{
-                width: 64,
-                height: 64,
+                width: 58,
+                height: 58,
                 background: "linear-gradient(135deg, #03A5EE, #0E8BC4)",
                 border: "3px solid white",
-                boxShadow: "0 8px 32px rgba(3,165,238,0.45), 0 2px 8px rgba(3,165,238,0.25)",
               }}
-              whileHover={{ scale: 1.1, boxShadow: "0 12px 40px rgba(3,165,238,0.55)" }}
-              whileTap={{ scale: 0.93 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
               transition={fabSpring}
             >
               <motion.div
-                animate={{ rotate: [0, -10, 10, 0] }}
-                transition={{ repeat: Infinity, repeatDelay: 5, duration: 1.5, ease: "easeInOut" }}
+                animate={{ rotate: [0, -8, 8, 0] }}
+                transition={{ repeat: Infinity, repeatDelay: 6, duration: 1.2, ease: "easeInOut" }}
               >
-                <Camera
-                  className="text-white"
-                  style={{ width: 28, height: 28 }}
-                  aria-hidden="true"
-                />
+                <Camera className="text-white" style={{ width: 26, height: 26 }} aria-hidden="true" />
               </motion.div>
             </motion.div>
           </Link>
@@ -220,54 +201,55 @@ export function DashboardShellClient({ children, enabledFlags, isAdmin }: Dashbo
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-surface dark:bg-surface-dark">
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:border-l lg:border-slate-200 lg:bg-white lg:dark:border-slate-800 lg:dark:bg-slate-900">
-        <div className="flex h-16 items-center justify-between px-5 border-b border-slate-100 dark:border-slate-800">
-          <AppLogo size={32} />
-          <ThemeToggle />
+    <div className="flex min-h-[100dvh] bg-surface dark:bg-surface-dark">
+      {/* ====== Desktop Sidebar ====== */}
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:border-l lg:border-border lg:bg-white lg:dark:border-slate-800 lg:dark:bg-slate-900">
+        <div className="flex h-16 items-center justify-between px-5 border-b border-border dark:border-slate-800">
+          <AppLogo size={30} />
         </div>
         <div className="flex-1 overflow-y-auto px-3 py-5">
           <NavLinks enabledFlags={enabledFlags} isAdmin={isAdmin} />
         </div>
-        <div className="px-3 py-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="px-3 py-4 border-t border-border dark:border-slate-800">
           <form action={signOutAction}>
-            <Button
+            <button
               type="submit"
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-3 text-slate-400 hover:text-red-500"
+              className="flex w-full items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
             >
               <LogOut className="h-4 w-4" />
               تسجيل الخروج
-            </Button>
+            </button>
           </form>
         </div>
       </aside>
 
-      <div className="flex flex-1 flex-col lg:mr-0">
-        <header className="sticky top-0 z-40 flex h-14 items-center gap-3 bg-white/70 dark:bg-slate-900/70 border-b border-slate-100 dark:border-slate-800 px-4 backdrop-blur-xl lg:hidden">
+      {/* ====== Main Area ====== */}
+      <div className="flex flex-1 flex-col lg:mr-0 min-h-[100dvh]">
+
+        {/* ====== Mobile Header ====== */}
+        <header className="sticky top-0 z-40 flex h-14 items-center gap-3 bg-white/80 dark:bg-slate-900/80 border-b border-border dark:border-slate-800 px-4 backdrop-blur-2xl safe-top lg:hidden">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+            className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 transition-all active:scale-90 dark:bg-slate-800 dark:text-slate-400"
             aria-label={sidebarOpen ? "إغلاق القائمة" : "فتح القائمة"}
           >
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-          <AppLogo size={28} showText={false} />
-          <span className="text-sm font-bold text-primary">نبض الطيبات</span>
-          <div className="mr-auto">
-            <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <AppLogo size={26} showText={false} />
+            <span className="text-sm font-bold text-primary">نبض الطيبات</span>
           </div>
         </header>
 
+        {/* ====== Mobile Drawer ====== */}
         <AnimatePresence>
           {sidebarOpen && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm lg:hidden"
+              transition={{ duration: 0.12 }}
+              className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm lg:hidden"
               onClick={() => setSidebarOpen(false)}
             >
               <motion.aside
@@ -276,25 +258,23 @@ export function DashboardShellClient({ children, enabledFlags, isAdmin }: Dashbo
                 exit={{ x: -280 }}
                 transition={springTransition}
                 onClick={(e) => e.stopPropagation()}
-                className="absolute right-0 top-0 bottom-0 w-[260px] bg-white dark:bg-slate-900 shadow-elevated"
+                className="absolute right-0 top-0 bottom-0 w-[270px] bg-white dark:bg-slate-900 shadow-elevated"
               >
-                <div className="flex h-14 items-center px-5 border-b border-slate-100 dark:border-slate-800">
-                  <AppLogo size={28} />
+                <div className="flex h-14 items-center px-5 border-b border-border dark:border-slate-800">
+                  <AppLogo size={26} />
                 </div>
                 <div className="overflow-y-auto px-3 py-5">
-                  <NavLinks enabledFlags={enabledFlags} isAdmin={isAdmin} />
+                  <NavLinks enabledFlags={enabledFlags} isAdmin={isAdmin} onClose={() => setSidebarOpen(false)} />
                 </div>
-                <div className="px-3 py-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="px-3 py-4 border-t border-border dark:border-slate-800">
                   <form action={signOutAction}>
-                    <Button
+                    <button
                       type="submit"
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start gap-3 text-slate-400 hover:text-red-500"
+                      className="flex w-full items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-medium text-slate-400 transition-all duration-150 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/20"
                     >
                       <LogOut className="h-4 w-4" />
                       تسجيل الخروج
-                    </Button>
+                    </button>
                   </form>
                 </div>
               </motion.aside>
@@ -302,11 +282,12 @@ export function DashboardShellClient({ children, enabledFlags, isAdmin }: Dashbo
           )}
         </AnimatePresence>
 
-        <main className="flex-1 px-4 pb-[100px] pt-5 lg:px-8 lg:pb-8 lg:pt-6">
+        {/* ====== Page Content ====== */}
+        <main className="flex-1 px-4 pb-[120px] pt-5 lg:px-8 lg:pb-8 lg:pt-6">
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
           >
             {children}
           </motion.div>
