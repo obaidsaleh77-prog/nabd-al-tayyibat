@@ -46,14 +46,6 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin", label: "الإدارة", icon: Shield, adminOnly: true },
 ];
 
-const BOTTOM_ITEMS: NavItem[] = [
-  { href: "/", label: "الرئيسية", icon: LayoutDashboard },
-  { href: "/meals", label: "الوجبات", icon: Utensils },
-  { href: "/camera", label: "الماسح", icon: Camera, flag: "camera_ocr" },
-  { href: "/weight", label: "الوزن", icon: Scale },
-  { href: "/settings", label: "الإعدادات", icon: Settings },
-];
-
 interface DashboardShellProps {
   children: React.ReactNode;
   enabledFlags?: Record<string, boolean>;
@@ -104,43 +96,120 @@ function NavLinks({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<string
 function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<string, boolean>; isAdmin?: boolean }) {
   const pathname = usePathname();
 
-  const items = isAdmin
-    ? [...BOTTOM_ITEMS.slice(0, -1), { href: "/admin", label: "الإدارة", icon: Shield }, ...BOTTOM_ITEMS.slice(-1)]
-    : BOTTOM_ITEMS;
+  const items = [
+    { href: "/", label: "الرئيسية", icon: LayoutDashboard },
+    { href: "/meals", label: "الوجبات", icon: Utensils },
+    isAdmin
+      ? { href: "/admin", label: "الإدارة", icon: Shield }
+      : { href: "/weight", label: "الوزن", icon: Scale },
+    { href: "/settings", label: "الإعدادات", icon: Settings },
+  ];
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-50 flex items-center justify-around bg-white/80 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-800 safe-bottom backdrop-blur-xl lg:hidden"
+      className="fixed bottom-0 inset-x-0 z-50 lg:hidden"
       aria-label="التنقل السفلي"
+      style={{ height: 88 }}
     >
-      {items.map((item) => {
-        if (item.flag && enabledFlags[item.flag] === false) return null;
-        const Icon = item.icon;
-        const active = pathname === item.href;
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "relative flex flex-col items-center gap-0.5 py-2 px-3 min-w-[56px] transition-all",
-              active ? (item.href === "/admin" ? "text-amber-500" : "text-primary") : "text-slate-400 dark:text-slate-500"
-            )}
-          >
-            {active ? (
+      {/* الخلفية بزوايا دائرية علوية */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundColor: "#DCD7EC",
+          borderRadius: "20px 20px 0 0",
+        }}
+      />
+
+      {/* عناصر التنقل — شبكة 5 أعمدة مع فراغ وسط للـ FAB */}
+      <div className="relative grid h-full w-full grid-cols-5 items-start px-2" style={{ paddingTop: 14 }}>
+        {items.map((item, i) => {
+          const Icon = item.icon;
+          const active = pathname === item.href;
+          // وضع العناصر في الأعمدة 1 و 2 و 4 و 5
+          const col = i < 2 ? i + 1 : i + 2;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "relative flex flex-col items-center gap-0.5 py-1 transition-all",
+                `col-start-${col}`
+              )}
+              style={{ gridColumnStart: col }}
+            >
+              {/* خلفية الـ active — تصميم دائري */}
+              {active ? (
+                <motion.div
+                  layoutId="nav-pill"
+                  className="absolute rounded-full bg-white/60"
+                  style={{
+                    width: 56,
+                    height: 56,
+                    top: -4,
+                    left: "50%",
+                    marginLeft: -28,
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                />
+              ) : null}
+
               <motion.div
-                layoutId="nav-pill"
+                className="relative z-10 flex items-center justify-center"
+                initial={false}
+                animate={{
+                  scale: active ? 1.1 : 1,
+                  y: active ? -2 : 0,
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              >
+                <Icon
+                  className={cn(
+                    "transition-colors duration-200",
+                    active ? "text-black" : "text-black/45"
+                  )}
+                  style={{ width: 32, height: 32 }}
+                  aria-hidden="true"
+                />
+              </motion.div>
+              <span
                 className={cn(
-                  "absolute -top-px inset-x-2 h-0.5 rounded-full",
-                  item.href === "/admin" ? "bg-amber-500" : "bg-primary"
+                  "relative z-10 text-xs font-bold leading-tight transition-colors duration-200",
+                  active ? "text-black" : "text-black/45"
                 )}
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              />
-            ) : null}
-            <Icon className="h-5 w-5" aria-hidden="true" />
-            <span className="text-[10px] font-medium leading-tight">{item.label}</span>
-          </Link>
-        );
-      })}
+                style={{ fontSize: 14 }}
+              >
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+
+        {/* الزر العائم الأوسط — الكاميرا */}
+        <Link
+          href="/camera"
+          className="absolute top-0 left-1/2 -translate-x-1/2 z-20"
+          style={{ marginTop: -4 }}
+        >
+          <motion.div
+            className="flex items-center justify-center rounded-full"
+            style={{
+              width: 110,
+              height: 110,
+              backgroundColor: "#E7E3F3",
+              border: "8px solid #F5F5F5",
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          >
+            <Camera
+              className="text-black"
+              style={{ width: 36, height: 36 }}
+              aria-hidden="true"
+            />
+          </motion.div>
+        </Link>
+      </div>
     </nav>
   );
 }
