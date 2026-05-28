@@ -107,49 +107,43 @@ function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<strin
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-50 lg:hidden"
+      className="fixed bottom-0 inset-x-0 z-50 lg:hidden safe-bottom"
       aria-label="التنقل السفلي"
-      style={{ height: 88 }}
+      style={{ height: 72, backgroundColor: "#03A5EE" }}
     >
-      {/* الخلفية بزوايا دائرية علوية */}
+      {/* الزوايا الدائرية العلوية */}
       <div
-        className="absolute inset-0"
-        style={{
-          backgroundColor: "#DCD7EC",
-          borderRadius: "20px 20px 0 0",
-        }}
+        className="absolute inset-x-0 -top-5 h-5"
+        style={{ backgroundColor: "#03A5EE" }}
       />
 
       {/* عناصر التنقل — شبكة 5 أعمدة مع فراغ وسط للـ FAB */}
-      <div className="relative grid h-full w-full grid-cols-5 items-start px-2" style={{ paddingTop: 14 }}>
+      <div className="relative grid h-full w-full grid-cols-5 items-center px-1">
         {items.map((item, i) => {
           const Icon = item.icon;
           const active = pathname === item.href;
-          // وضع العناصر في الأعمدة 1 و 2 و 4 و 5
           const col = i < 2 ? i + 1 : i + 2;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={cn(
-                "relative flex flex-col items-center gap-0.5 py-1 transition-all",
-                `col-start-${col}`
-              )}
-              style={{ gridColumnStart: col }}
+              className="relative flex flex-col items-center justify-center gap-0 py-1"
+              style={{ gridColumnStart: col, gridRowStart: 1 }}
             >
-              {/* خلفية الـ active — تصميم دائري */}
+              {/* خلفية الـ active — دائرة بيضاء */}
               {active ? (
                 <motion.div
                   layoutId="nav-pill"
-                  className="absolute rounded-full bg-white/60"
+                  className="absolute rounded-full bg-white"
                   style={{
-                    width: 56,
-                    height: 56,
-                    top: -4,
+                    width: 40,
+                    height: 40,
+                    top: "50%",
                     left: "50%",
-                    marginLeft: -28,
+                    marginTop: -28,
+                    marginLeft: -20,
                   }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               ) : null}
 
@@ -157,26 +151,26 @@ function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<strin
                 className="relative z-10 flex items-center justify-center"
                 initial={false}
                 animate={{
-                  scale: active ? 1.1 : 1,
-                  y: active ? -2 : 0,
+                  scale: active ? 1 : 0.85,
+                  y: active ? -4 : 0,
                 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
               >
                 <Icon
                   className={cn(
-                    "transition-colors duration-200",
-                    active ? "text-black" : "text-black/45"
+                    "transition-all duration-200",
+                    active ? "text-[#03A5EE]" : "text-white"
                   )}
-                  style={{ width: 32, height: 32 }}
+                  style={{ width: 26, height: 26 }}
                   aria-hidden="true"
                 />
               </motion.div>
               <span
                 className={cn(
-                  "relative z-10 text-xs font-bold leading-tight transition-colors duration-200",
-                  active ? "text-black" : "text-black/45"
+                  "relative z-10 leading-tight transition-all duration-200",
+                  active ? "text-white font-bold" : "text-white/70 font-medium"
                 )}
-                style={{ fontSize: 14 }}
+                style={{ fontSize: 11, marginTop: active ? 2 : 6 }}
               >
                 {item.label}
               </span>
@@ -187,24 +181,24 @@ function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<strin
         {/* الزر العائم الأوسط — الكاميرا */}
         <Link
           href="/camera"
-          className="absolute top-0 left-1/2 -translate-x-1/2 z-20"
-          style={{ marginTop: -4 }}
+          className="absolute left-1/2 -translate-x-1/2 z-20"
+          style={{ top: -28 }}
         >
           <motion.div
-            className="flex items-center justify-center rounded-full"
+            className="flex items-center justify-center rounded-full shadow-lg"
             style={{
-              width: 110,
-              height: 110,
-              backgroundColor: "#E7E3F3",
-              border: "8px solid #F5F5F5",
+              width: 56,
+              height: 56,
+              backgroundColor: "#03A5EE",
+              border: "3px solid white",
             }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
           >
             <Camera
-              className="text-black"
-              style={{ width: 36, height: 36 }}
+              className="text-white"
+              style={{ width: 26, height: 26 }}
               aria-hidden="true"
             />
           </motion.div>
