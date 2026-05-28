@@ -20,6 +20,10 @@ export const metadata: Metadata = {
   description:
     "تطبيق متابعة الالتزام بنظام الطيبات للدكتور ضياء العوضي — تتبع ذكي، نبض حياتك الصحية",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icons/icon.svg",
+    apple: "/icons/icon.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
