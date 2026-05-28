@@ -96,7 +96,7 @@ function NavLinks({ enabledFlags = {}, isAdmin, onClose }: { enabledFlags?: Reco
   );
 }
 
-/* ───── شريط التنقل السفلي مع FAB لإضافة وجبة ───── */
+/* ───── شريط التنقل السفلي — تصميم عصري أنيق ───── */
 function BottomNav({
   enabledFlags = {},
   isAdmin,
@@ -117,14 +117,17 @@ function BottomNav({
     { href: "/settings", label: "الإعدادات", icon: Settings },
   ];
 
-  const fabSpring = { type: "spring" as const, stiffness: 400, damping: 25 };
+  const springFast = { type: "spring" as const, stiffness: 500, damping: 30 };
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-50 lg:hidden" aria-label="التنقل السفلي">
+    <nav className="fixed bottom-0 inset-x-0 z-50 lg:hidden safe-bottom" aria-label="التنقل السفلي">
       <div
-        className="relative mx-3 mb-2 rounded-[28px] shadow-[0_-4px_30px_rgba(3,165,238,0.2)] backdrop-blur-2xl"
-        style={{ height: 64, backgroundColor: "#03A5EE" }}
+        className="relative mx-3 mb-3 rounded-[34px] bg-white/95 backdrop-blur-2xl shadow-elevated border border-border/40"
+        style={{ height: 70 }}
       >
+        {/* خط علوي دقيق كحد فاصل */}
+        <div className="absolute top-0 inset-x-8 h-px bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
+
         <div className="relative grid h-full w-full grid-cols-5 items-center">
           {items.map((item, i) => {
             const Icon = item.icon;
@@ -134,74 +137,93 @@ function BottomNav({
               <Link
                 key={item.href}
                 href={item.href}
-                className="relative flex flex-col items-center justify-end pb-1.5"
-                style={{ gridColumnStart: col, gridRowStart: 1 }}
+                className="relative flex flex-col items-center justify-center gap-0"
+                style={{ gridColumnStart: col, gridRowStart: 1, paddingTop: 4 }}
               >
-                {active ? (
-                  <motion.div
-                    layoutId="nav-pill"
-                    className="absolute rounded-2xl bg-white shadow-sm"
-                    style={{ width: 40, height: 28, top: -10 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  />
-                ) : null}
-
+                {/* أيقونة بحاوية دائريّة */}
                 <motion.div
-                  className="relative z-10 flex items-center justify-center"
+                  className="relative flex items-center justify-center rounded-2xl transition-colors duration-200"
+                  style={{ width: 44, height: 32 }}
                   initial={false}
                   animate={{
-                    scale: active ? 1.05 : 0.85,
-                    y: active ? -6 : -1,
+                    backgroundColor: active ? "rgba(3, 165, 238, 0.1)" : "transparent",
                   }}
-                  transition={{ type: "spring", stiffness: 400, damping: 22 }}
                 >
-                  <Icon
-                    className={cn("transition-colors duration-150", active ? "text-[#03A5EE]" : "text-white/90")}
-                    style={{ width: active ? 22 : 20, height: active ? 22 : 20 }}
-                    aria-hidden="true"
-                  />
+                  {active ? (
+                    <motion.div
+                      layoutId="nav-indicator"
+                      className="absolute inset-0 rounded-2xl bg-primary/10"
+                      transition={springFast}
+                    />
+                  ) : null}
+                  <motion.div
+                    className="relative z-10 flex items-center justify-center"
+                    initial={false}
+                    animate={{
+                      scale: active ? 1 : 0.9,
+                      y: active ? -10 : 0,
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                  >
+                    <Icon
+                      className={cn(
+                        "transition-all duration-200",
+                        active ? "text-primary" : "text-slate-300 dark:text-slate-500"
+                      )}
+                      style={{ width: 24, height: 24 }}
+                      aria-hidden="true"
+                    />
+                  </motion.div>
                 </motion.div>
-                <span
-                  className={cn(
-                    "relative z-10 leading-tight transition-all duration-150",
-                    active ? "text-white font-bold" : "text-white/55 font-medium"
-                  )}
-                  style={{ fontSize: 9, marginTop: active ? 3 : 5 }}
+
+                {/* التسمية */}
+                <motion.span
+                  className="leading-tight text-center transition-all duration-200"
+                  initial={false}
+                  animate={{
+                    opacity: active ? 1 : 0.5,
+                    y: active ? -2 : 3,
+                    fontSize: active ? 10 : 9,
+                  }}
+                  style={{
+                    color: active ? "#03A5EE" : "#94A3B8",
+                    fontWeight: active ? 700 : 400,
+                  }}
                 >
                   {item.label}
-                </span>
+                </motion.span>
               </Link>
             );
           })}
 
-          {/* FAB الأوسط — إضافة وجبة سريعة */}
+          {/* FAB الأوسط — أيقونة بارزة مع تدرج وتوهج */}
           <button
             type="button"
             onClick={onAddMeal}
             className="absolute left-1/2 -translate-x-1/2 z-20 cursor-pointer"
-            style={{ top: -32 }}
+            style={{ top: -30 }}
             aria-label="إضافة وجبة"
           >
             <motion.div
-              className="relative flex items-center justify-center rounded-full shadow-fab"
+              className="relative flex items-center justify-center rounded-full"
               style={{
-                width: 58,
-                height: 58,
+                width: 62,
+                height: 62,
                 background: "linear-gradient(135deg, #03A5EE, #0E8BC4)",
-                border: "3px solid white",
+                boxShadow: "0 6px 28px rgba(3,165,238,0.4), 0 0 0 4px white",
               }}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              transition={fabSpring}
+              whileHover={{ scale: 1.06, boxShadow: "0 8px 32px rgba(3,165,238,0.5), 0 0 0 4px white" }}
+              whileTap={{ scale: 0.93 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
             >
-              {/* حلقة نبض خارجية */}
+              {/* حلقة توهج نابضة */}
               <motion.span
                 className="absolute inset-0 rounded-full"
                 style={{
                   background: "linear-gradient(135deg, #03A5EE, #0E8BC4)",
-                  opacity: 0.3,
+                  opacity: 0.25,
                 }}
-                animate={{ scale: [1, 1.25, 1], opacity: [0.3, 0, 0.3] }}
+                animate={{ scale: [1, 1.3, 1], opacity: [0.25, 0, 0.25] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               />
               <Plus className="text-white relative z-10" style={{ width: 28, height: 28 }} aria-hidden="true" />
