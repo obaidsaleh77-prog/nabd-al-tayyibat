@@ -131,6 +131,54 @@ export async function saveBlogPostAction(
   return { success: true };
 }
 
+export async function deleteBlogPostAction(
+  _prev: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  const auth = await requireAdmin();
+  if ("error" in auth) return { error: auth.error };
+
+  const id = formData.get("id");
+  if (!id || typeof id !== "string") return { error: "معرّف المقال مطلوب" };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("blog_posts").delete().eq("id", id);
+
+  if (error) return { error: "تعذر حذف المقال" };
+
+  revalidatePath("/blog");
+  revalidatePath("/admin/content");
+  return { success: true };
+}
+
+export async function toggleBlogPublishAction(
+  _prev: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  const auth = await requireAdmin();
+  if ("error" in auth) return { error: auth.error };
+
+  const id = formData.get("id");
+  const published = formData.get("published") === "true";
+
+  if (!id || typeof id !== "string") return { error: "معرّف المقال مطلوب" };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("blog_posts")
+    .update({
+      is_published: published,
+      published_at: published ? new Date().toISOString() : null,
+    })
+    .eq("id", id);
+
+  if (error) return { error: "تعذر تحديث النشر" };
+
+  revalidatePath("/blog");
+  revalidatePath("/admin/content");
+  return { success: true };
+}
+
 export async function saveRulesVersionAction(
   _prev: AdminActionState,
   formData: FormData
