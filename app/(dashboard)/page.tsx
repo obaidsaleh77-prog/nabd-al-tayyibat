@@ -72,7 +72,7 @@ export default async function DashboardPage() {
               مرحباً، {firstName}
             </h1>
             <div className="flex items-center gap-1.5 text-xs text-muted">
-              <Sparkles className="h-3 w-3 text-primary" />
+              <Sparkles className="h-3 w-3 text-primary" strokeWidth={1.5} />
               <span>كيف صحتك اليوم؟</span>
             </div>
           </div>
@@ -94,29 +94,27 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* ====== 2. شبكة الإحصائيات السريعة (2×2) ====== */}
+      {/* ====== 2. شبكة الإحصائيات — 4 بطاقات متساوية ====== */}
       <div className="grid grid-cols-2 gap-3 mb-6">
         {[
-          { href: "/meals", label: "وجبات اليوم", value: formatNumberAr(meals.length), icon: Utensils, gradient: "from-secondary/20 to-secondary/5", color: "text-secondary" },
-          { href: "/weight", label: "الوزن", value: "تسجيل", icon: Scale, gradient: "from-primary/20 to-primary/5", color: "text-primary" },
-          { href: "/health-status", label: "الحالة الصحية", value: "صحتي", icon: Activity, gradient: "from-accent/20 to-accent/5", color: "text-accent" },
-          { href: "/rules", label: "الدليل الغذائي", value: "التفاصيل", icon: Timer, gradient: "from-emerald-500/20 to-emerald-500/5", color: "text-emerald-500" },
+          { href: "/meals", label: "وجبات اليوم", value: formatNumberAr(meals.length), icon: Utensils, gradient: "from-secondary/20 to-secondary/5", color: "text-secondary", bg: "bg-secondary/10" },
+          { href: "/weight", label: "الوزن", value: "تسجيل", icon: Scale, gradient: "from-primary/20 to-primary/5", color: "text-primary", bg: "bg-primary/10" },
+          { href: "/health-status", label: "الحالة الصحية", value: "صحتي", icon: Activity, gradient: "from-accent/20 to-accent/5", color: "text-accent", bg: "bg-accent/10" },
+          { href: "/rules", label: "الدليل الغذائي", value: "التفاصيل", icon: Timer, gradient: "from-emerald-500/20 to-emerald-500/5", color: "text-emerald-500", bg: "bg-emerald-500/10" },
         ].map((item, i) => {
           const Icon = item.icon;
           return (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.href} href={item.href} className="flex">
               <Card
-                className="group relative overflow-hidden p-4 transition-all duration-200 active:scale-[0.97] animate-slide-up"
+                className="group relative flex w-full items-center gap-3 overflow-hidden p-4 transition-all duration-200 active:scale-[0.97] animate-slide-up"
                 style={stagger(i)}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} ${item.color}`}>
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted">{item.label}</p>
-                    <p className="text-xl font-bold text-slate-900 dark:text-white">{item.value}</p>
-                  </div>
+                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${item.bg} ${item.color}`}>
+                  <Icon className="h-6 w-6" strokeWidth={1.5} />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <p className="text-xs text-muted truncate">{item.label}</p>
+                  <p className="text-lg font-bold text-slate-900 dark:text-white">{item.value}</p>
                 </div>
                 <div className="absolute -bottom-2 -left-2 opacity-[0.04] select-none pointer-events-none">
                   <Icon className="h-16 w-16" />
@@ -140,16 +138,16 @@ export default async function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Apple className="h-4 w-4" />
+                <Apple className="h-4 w-4" strokeWidth={1.5} />
               </div>
               <h2 className="text-sm font-bold text-slate-800 dark:text-white">وجبات اليوم</h2>
             </div>
-            <Link
-              href="/meals"
-              className="flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:text-primary/80"
-            >
-              عرض الكل <ChevronLeft className="h-3 w-3" />
-            </Link>
+                <Link
+                  href="/meals"
+                  className="flex items-center gap-1 text-xs font-medium text-primary transition-colors hover:text-primary/80"
+                >
+                  عرض الكل <ChevronLeft className="h-3 w-3" strokeWidth={2} />
+                </Link>
           </div>
 
           {meals.length === 0 ? (
@@ -214,7 +212,7 @@ export default async function DashboardPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-white/20">
-              <Flame className="h-4 w-4" />
+              <Flame className="h-4 w-4" strokeWidth={1.5} />
             </div>
             <span className="text-sm font-bold">نصيحة اليوم</span>
           </div>
@@ -224,11 +222,11 @@ export default async function DashboardPage() {
           </p>
           <div className="flex items-center gap-3 mt-3 pt-3 border-t border-white/20">
             <div className="flex items-center gap-1.5 text-xs opacity-80">
-              <Droplets className="h-3 w-3" />
+              <Droplets className="h-3 w-3" strokeWidth={1.5} />
               <span>اشرب 8 أكواب ماء</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs opacity-80">
-              <Clock className="h-3 w-3" />
+              <Clock className="h-3 w-3" strokeWidth={1.5} />
               <span>4 ساعات بين الوجبات</span>
             </div>
           </div>
