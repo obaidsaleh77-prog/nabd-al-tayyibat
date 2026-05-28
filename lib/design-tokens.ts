@@ -36,7 +36,7 @@ export const borderRadius = {
 } as const;
 
 export const colors = {
-  primary: "#03A5EE",
+  primary: "#6B4EE6",
   secondary: "#10B981",
   accent: "#F59E0B",
   background: "#F5F7FA",
@@ -49,7 +49,7 @@ export const colors = {
 export const shadows = {
   card: "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.02)",
   elevated: "0 12px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.03)",
-  fab: "0 8px 32px rgba(3,165,238,0.35), 0 2px 8px rgba(3,165,238,0.2)",
+  fab: "0 8px 32px rgba(107,78,230,0.35), 0 2px 8px rgba(107,78,230,0.2)",
 } as const;
 
 export const transitions = {

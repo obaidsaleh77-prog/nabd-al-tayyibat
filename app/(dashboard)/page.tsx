@@ -80,7 +80,7 @@ export default async function DashboardPage() {
               <circle cx="36" cy="36" r="30" fill="none" stroke="#E8ECF0" strokeWidth="5" />
               <circle
                 cx="36" cy="36" r="30"
-                fill="none" stroke="#03A5EE" strokeWidth="5"
+                fill="none" stroke="#6B4EE6" strokeWidth="5"
                 strokeLinecap="round"
                 strokeDasharray={`${2 * Math.PI * 30 * (percent / 100)} ${2 * Math.PI * 30 * (1 - percent / 100)}`}
                 className="transition-all duration-1000"

@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --primary: #03A5EE;
-  --primary-light: #38BDF8;
+  --primary: #6B4EE6;
+  --primary-light: #8B7EF5;
   --secondary: #10B981;
   --accent: #F59E0B;
   --background: #F5F7FA;
@@ -41,7 +41,7 @@ body {
 }
 
 ::selection {
-  background-color: rgba(3, 165, 238, 0.15);
+  background-color: rgba(107, 78, 230, 0.15);
   color: var(--foreground);
 }
 
@@ -92,7 +92,7 @@ body {
 
 @layer components {
   .gradient-primary {
-    background: linear-gradient(135deg, #03A5EE, #0E8BC4);
+    background: linear-gradient(135deg, #6B4EE6, #8B7EF5);
   }
   .gradient-secondary {
     background: linear-gradient(135deg, #10B981, #059669);
@@ -101,7 +101,7 @@ body {
     background: linear-gradient(135deg, #F59E0B, #FB923C);
   }
   .gradient-health {
-    background: linear-gradient(135deg, #03A5EE, #10B981);
+    background: linear-gradient(135deg, #6B4EE6, #10B981);
   }
   .glass {
     background: rgba(255, 255, 255, 0.72);
