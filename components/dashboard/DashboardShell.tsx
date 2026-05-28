@@ -105,104 +105,110 @@ function BottomNav({ enabledFlags = {}, isAdmin }: { enabledFlags?: Record<strin
     { href: "/settings", label: "الإعدادات", icon: Settings },
   ];
 
+  const fabSpring = { type: "spring" as const, stiffness: 400, damping: 25 };
+
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-50 lg:hidden safe-bottom"
+      className="fixed bottom-0 inset-x-0 z-50 lg:hidden"
       aria-label="التنقل السفلي"
-      style={{ height: 72, backgroundColor: "#03A5EE" }}
     >
-      {/* الزوايا الدائرية العلوية */}
+      {/* الهيكل الخارجي — بار عائم مع ظل وتأثير زجاجي */}
       <div
-        className="absolute inset-x-0 -top-5 h-5"
-        style={{ backgroundColor: "#03A5EE" }}
-      />
-
-      {/* عناصر التنقل — شبكة 5 أعمدة مع فراغ وسط للـ FAB */}
-      <div className="relative grid h-full w-full grid-cols-5 items-center px-1">
-        {items.map((item, i) => {
-          const Icon = item.icon;
-          const active = pathname === item.href;
-          const col = i < 2 ? i + 1 : i + 2;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="relative flex flex-col items-center justify-center gap-0 py-1"
-              style={{ gridColumnStart: col, gridRowStart: 1 }}
-            >
-              {/* خلفية الـ active — دائرة بيضاء */}
-              {active ? (
-                <motion.div
-                  layoutId="nav-pill"
-                  className="absolute rounded-full bg-white"
-                  style={{
-                    width: 40,
-                    height: 40,
-                    top: "50%",
-                    left: "50%",
-                    marginTop: -28,
-                    marginLeft: -20,
-                  }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                />
-              ) : null}
-
-              <motion.div
-                className="relative z-10 flex items-center justify-center"
-                initial={false}
-                animate={{
-                  scale: active ? 1 : 0.85,
-                  y: active ? -4 : 0,
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+        className="relative mx-3 mb-3 rounded-[28px] shadow-[0_-4px_30px_rgba(3,165,238,0.25)] backdrop-blur-2xl"
+        style={{ height: 68, backgroundColor: "#03A5EE" }}
+      >
+        {/* عناصر التنقل — شبكة 5 أعمدة */}
+        <div className="relative grid h-full w-full grid-cols-5 items-center">
+          {items.map((item, i) => {
+            const Icon = item.icon;
+            const active = pathname === item.href;
+            const col = i < 2 ? i + 1 : i + 2;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="relative flex flex-col items-center justify-end pb-2"
+                style={{ gridColumnStart: col, gridRowStart: 1 }}
               >
-                <Icon
+                {/* الـ active pill — دائرة بيضاء ناعمة مع ظل */}
+                {active ? (
+                  <motion.div
+                    layoutId="nav-pill"
+                    className="absolute rounded-2xl bg-white shadow-sm"
+                    style={{
+                      width: 44,
+                      height: 32,
+                      top: -14,
+                    }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                ) : null}
+
+                <motion.div
+                  className="relative z-10 flex items-center justify-center"
+                  initial={false}
+                  animate={{
+                    scale: active ? 1.05 : 0.9,
+                    y: active ? -8 : -2,
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                >
+                  <Icon
+                    className={cn(
+                      "transition-colors duration-150",
+                      active ? "text-[#03A5EE]" : "text-white"
+                    )}
+                    style={{ width: active ? 24 : 22, height: active ? 24 : 22 }}
+                    aria-hidden="true"
+                  />
+                </motion.div>
+                <span
                   className={cn(
-                    "transition-all duration-200",
-                    active ? "text-[#03A5EE]" : "text-white"
+                    "relative z-10 leading-tight transition-all duration-150",
+                    active
+                      ? "text-white font-bold"
+                      : "text-white/55 font-medium"
                   )}
-                  style={{ width: 26, height: 26 }}
+                  style={{ fontSize: 10, marginTop: active ? 4 : 6 }}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+
+          {/* الزر العائم الأوسط — الكاميرا بتصميم مرتفع */}
+          <Link
+            href="/camera"
+            className="absolute left-1/2 -translate-x-1/2 z-20"
+            style={{ top: -36 }}
+          >
+            <motion.div
+              className="flex items-center justify-center rounded-full"
+              style={{
+                width: 64,
+                height: 64,
+                background: "linear-gradient(135deg, #03A5EE, #0E8BC4)",
+                border: "3px solid white",
+                boxShadow: "0 8px 32px rgba(3,165,238,0.45), 0 2px 8px rgba(3,165,238,0.25)",
+              }}
+              whileHover={{ scale: 1.1, boxShadow: "0 12px 40px rgba(3,165,238,0.55)" }}
+              whileTap={{ scale: 0.93 }}
+              transition={fabSpring}
+            >
+              <motion.div
+                animate={{ rotate: [0, -10, 10, 0] }}
+                transition={{ repeat: Infinity, repeatDelay: 5, duration: 1.5, ease: "easeInOut" }}
+              >
+                <Camera
+                  className="text-white"
+                  style={{ width: 28, height: 28 }}
                   aria-hidden="true"
                 />
               </motion.div>
-              <span
-                className={cn(
-                  "relative z-10 leading-tight transition-all duration-200",
-                  active ? "text-white font-bold" : "text-white/70 font-medium"
-                )}
-                style={{ fontSize: 11, marginTop: active ? 2 : 6 }}
-              >
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
-
-        {/* الزر العائم الأوسط — الكاميرا */}
-        <Link
-          href="/camera"
-          className="absolute left-1/2 -translate-x-1/2 z-20"
-          style={{ top: -28 }}
-        >
-          <motion.div
-            className="flex items-center justify-center rounded-full shadow-lg"
-            style={{
-              width: 56,
-              height: 56,
-              backgroundColor: "#03A5EE",
-              border: "3px solid white",
-            }}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-          >
-            <Camera
-              className="text-white"
-              style={{ width: 26, height: 26 }}
-              aria-hidden="true"
-            />
-          </motion.div>
-        </Link>
+            </motion.div>
+          </Link>
+        </div>
       </div>
     </nav>
   );
@@ -296,7 +302,7 @@ export function DashboardShellClient({ children, enabledFlags, isAdmin }: Dashbo
           )}
         </AnimatePresence>
 
-        <main className="flex-1 px-4 pb-24 pt-5 lg:px-8 lg:pb-8 lg:pt-6">
+        <main className="flex-1 px-4 pb-[100px] pt-5 lg:px-8 lg:pb-8 lg:pt-6">
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
