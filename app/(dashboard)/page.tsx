@@ -11,7 +11,6 @@ import {
   Apple,
   Flame,
   Droplets,
-  Plus,
 } from "lucide-react";
 import { ComplianceGauge } from "@/components/charts/ComplianceGauge";
 import { Card } from "@/components/ui/card";
@@ -106,7 +105,7 @@ export default async function DashboardPage() {
           return (
             <Link key={item.href} href={item.href} className="flex">
               <Card
-                className="group relative flex w-full items-center gap-3 overflow-hidden p-4 transition-all duration-200 active:scale-[0.97] animate-slide-up"
+                className="group relative flex h-full w-full items-center gap-3 overflow-hidden p-4 transition-all duration-200 active:scale-[0.97] animate-slide-up"
                 style={stagger(i)}
               >
                 <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${item.bg} ${item.color}`}>
@@ -233,13 +232,8 @@ export default async function DashboardPage() {
         </div>
       </Card>
 
-      {/* ====== 5. دعوة لاستخدام الزر العائم — تختفي لوحدها ====== */}
-      <div className="flex items-center justify-center gap-2 pb-4 animate-slide-up" style={stagger(7)}>
-        <div className="flex items-center gap-2 rounded-2xl bg-primary/5 px-4 py-3 text-xs text-muted">
-          <Plus className="h-4 w-4 text-primary" />
-          <span>اضغط الزر الأزرق في الأسفل لإضافة وجبة</span>
-        </div>
-      </div>
+      {/* ====== 5. محاذاة ختامية ====== */}
+      <div className="pb-4" />
     </div>
   );
 }

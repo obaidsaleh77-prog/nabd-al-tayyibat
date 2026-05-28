@@ -17,13 +17,10 @@ import {
   Menu,
   X,
   Shield,
-  Plus,
 } from "lucide-react";
 import { useState } from "react";
 import { AppLogo } from "@/components/branding/AppLogo";
 import { Button } from "@/components/ui/button";
-import { BottomSheet } from "@/components/ui/BottomSheet";
-import { MealForm } from "@/components/forms/MealForm";
 import { signOutAction } from "@/app/actions/auth";
 import { cn } from "@/lib/utils";
 
@@ -96,25 +93,22 @@ function NavLinks({ enabledFlags = {}, isAdmin, onClose }: { enabledFlags?: Reco
   );
 }
 
-/* ───── شريط سفلي عائم بتصميم عصري — FAB بنفسجي ───── */
+/* ───── شريط سفلي عائم — تصميم مطابق للمرجع ───── */
 function BottomNav({
   enabledFlags = {},
   isAdmin,
-  onAddMeal,
 }: {
   enabledFlags?: Record<string, boolean>;
   isAdmin?: boolean;
-  onAddMeal: () => void;
 }) {
   const pathname = usePathname();
 
+  /* الترتيب من اليمين لليسار (RTL): الرئيسية | الإحصائيات | [FAB] | الوجبات | الملف */
   const items = [
     { href: "/", label: "الرئيسية", icon: LayoutDashboard },
+    { href: "/health-status", label: "الإحصائيات", icon: Activity },
     { href: "/meals", label: "الوجبات", icon: Utensils },
-    isAdmin
-      ? { href: "/admin", label: "الإدارة", icon: Shield }
-      : { href: "/weight", label: "الوزن", icon: Scale },
-    { href: "/settings", label: "الإعدادات", icon: Settings },
+    { href: "/settings", label: "الملف", icon: Settings },
   ];
 
   const springFast = { type: "spring" as const, stiffness: 500, damping: 30 };
@@ -122,13 +116,13 @@ function BottomNav({
   return (
     <nav className="fixed bottom-0 inset-x-0 z-50 lg:hidden" aria-label="التنقل السفلي">
       <div
-        className="relative mx-4 mb-4 rounded-[36px] bg-white backdrop-blur-2xl"
+        className="relative mx-4 mb-4 rounded-[24px] bg-white/95 backdrop-blur-xl"
         style={{
-          height: 72,
-          boxShadow: "0 4px 30px rgba(0,0,0,0.06), 0 1px 8px rgba(0,0,0,0.03)",
+          height: 68,
+          boxShadow: "0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.03)",
         }}
       >
-        <div className="relative grid h-full w-full grid-cols-5 items-center px-1">
+        <div className="relative grid h-full w-full grid-cols-5 items-center">
           {items.map((item, i) => {
             const Icon = item.icon;
             const active = pathname === item.href;
@@ -137,22 +131,23 @@ function BottomNav({
               <Link
                 key={item.href}
                 href={item.href}
-                className="relative flex flex-col items-center justify-center gap-0"
-                style={{ gridColumnStart: col, gridRowStart: 1, paddingTop: 3 }}
+                className="relative flex flex-col items-center justify-center"
+                style={{ gridColumnStart: col, gridRowStart: 1 }}
               >
-                {/* حاوية الأيقونة مع active pill ناعم */}
+                {/* الأيقونة — النشط: خلفية بنفسجية فاتحة */}
                 <motion.div
-                  className="relative flex items-center justify-center rounded-full transition-colors duration-200"
-                  style={{ width: 40, height: 40 }}
+                  className="relative flex items-center justify-center rounded-xl transition-colors duration-200"
+                  style={{ width: 42, height: 36 }}
                   initial={false}
                   animate={{
-                    backgroundColor: active ? "rgba(139,92,246,0.12)" : "transparent",
+                    backgroundColor: active ? "rgba(107,78,230,0.1)" : "transparent",
                   }}
                 >
                   {active ? (
                     <motion.div
-                      layoutId="nav-dot"
-                      className="absolute inset-0 rounded-full bg-purple-100 dark:bg-purple-900/30"
+                      layoutId="nav-indicator"
+                      className="absolute inset-0 rounded-xl bg-purple-50"
+                      style={{ backgroundColor: "rgba(107,78,230,0.1)" }}
                       transition={springFast}
                     />
                   ) : null}
@@ -160,76 +155,74 @@ function BottomNav({
                     className="relative z-10 flex items-center justify-center"
                     initial={false}
                     animate={{
-                      scale: active ? 1 : 0.88,
-                      y: active ? -8 : 0,
+                      scale: active ? 1 : 0.9,
+                      y: active ? -6 : 0,
                     }}
                     transition={{ type: "spring", stiffness: 400, damping: 22 }}
                   >
                     <Icon
-                      className={cn(
-                        "transition-all duration-200",
-                        active ? "text-purple-500" : "text-slate-400 dark:text-slate-500"
-                      )}
+                      className={cn("transition-all duration-200", active ? "text-[#6B4EE6]" : "text-slate-400")}
                       style={{ width: 22, height: 22, strokeWidth: 1.5 }}
                       aria-hidden="true"
                     />
                   </motion.div>
                 </motion.div>
 
-                {/* تسمية أسفل الأيقونة */}
-                <motion.span
-                  className="leading-tight text-center transition-all duration-200"
-                  initial={false}
-                  animate={{
-                    opacity: active ? 1 : 0.45,
-                    y: active ? -1 : 3,
-                    fontSize: active ? 9.5 : 8.5,
-                  }}
+                {/* التسمية */}
+                <span
+                  className={cn(
+                    "leading-tight text-center transition-all duration-200",
+                    active ? "font-bold" : "font-medium"
+                  )}
                   style={{
-                    color: active ? "#8B5CF6" : "#94A3B8",
-                    fontWeight: active ? 700 : 400,
-                    letterSpacing: "0.02em",
+                    fontSize: active ? 10 : 8.5,
+                    color: active ? "#6B4EE6" : "#94A3B8",
+                    opacity: active ? 1 : 0.5,
+                    marginTop: active ? 1 : 4,
                   }}
                 >
                   {item.label}
-                </motion.span>
+                </span>
               </Link>
             );
           })}
 
-          {/* FAB أوسط — تدرج بنفسجي مع توهج ناعم */}
-          <button
-            type="button"
-            onClick={onAddMeal}
-            className="absolute left-1/2 -translate-x-1/2 z-20 cursor-pointer"
-            style={{ top: -28 }}
-            aria-label="إضافة وجبة"
+          {/* FAB أوسط — دائرة بنفسجية مع أيقونة كاميرا */}
+          <Link
+            href="/camera"
+            className="absolute left-1/2 -translate-x-1/2 z-20"
+            style={{ top: -24 }}
+            aria-label="الماسح الضوئي"
           >
             <motion.div
               className="relative flex items-center justify-center rounded-full"
               style={{
-                width: 60,
-                height: 60,
-                background: "linear-gradient(135deg, #8B5CF6, #6D28D9)",
-                boxShadow: "0 8px 28px rgba(139,92,246,0.35), 0 0 0 3px white",
+                width: 58,
+                height: 58,
+                background: "linear-gradient(135deg, #6B4EE6, #8B7EF5)",
+                boxShadow: "0 8px 28px rgba(107,78,230,0.35), 0 0 0 3px white",
               }}
-              whileHover={{ scale: 1.07, boxShadow: "0 10px 34px rgba(139,92,246,0.45), 0 0 0 3px white" }}
+              whileHover={{ scale: 1.07, boxShadow: "0 10px 34px rgba(107,78,230,0.45), 0 0 0 3px white" }}
               whileTap={{ scale: 0.92 }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
             >
-              {/* حلقة توهج نابضة بنفسجية */}
+              {/* حلقة توهج نابضة */}
               <motion.span
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: "linear-gradient(135deg, #8B5CF6, #6D28D9)",
-                  opacity: 0.25,
+                  background: "linear-gradient(135deg, #6B4EE6, #8B7EF5)",
+                  opacity: 0.2,
                 }}
-                animate={{ scale: [1, 1.35, 1], opacity: [0.25, 0, 0.25] }}
+                animate={{ scale: [1, 1.35, 1], opacity: [0.2, 0, 0.2] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               />
-              <Plus className="text-white relative z-10" style={{ width: 28, height: 28 }} aria-hidden="true" />
+              <Camera
+                className="text-white relative z-10"
+                style={{ width: 26, height: 26, strokeWidth: 1.5 }}
+                aria-hidden="true"
+              />
             </motion.div>
-          </button>
+          </Link>
         </div>
       </div>
     </nav>
@@ -240,7 +233,6 @@ const springTransition = { type: "spring", stiffness: 300, damping: 30 };
 
 export function DashboardShellClient({ children, enabledFlags, isAdmin }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [mealSheetOpen, setMealSheetOpen] = useState(false);
 
   return (
     <div className="flex min-h-[100dvh] bg-surface dark:bg-surface-dark">
@@ -335,12 +327,7 @@ export function DashboardShellClient({ children, enabledFlags, isAdmin }: Dashbo
         </main>
       </div>
 
-      <BottomNav enabledFlags={enabledFlags} isAdmin={isAdmin} onAddMeal={() => setMealSheetOpen(true)} />
-
-      {/* ====== Bottom Sheet — إضافة وجبة ====== */}
-      <BottomSheet open={mealSheetOpen} onClose={() => setMealSheetOpen(false)} title="إضافة وجبة جديدة">
-        <MealForm />
-      </BottomSheet>
+      <BottomNav enabledFlags={enabledFlags} isAdmin={isAdmin} />
     </div>
   );
 }
