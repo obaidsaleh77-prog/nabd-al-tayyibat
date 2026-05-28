@@ -98,11 +98,11 @@ export function AppLogo({
       </svg>
 
       {showText ? (
-        <div className="flex flex-col leading-tight">
+        <div className="flex flex-col leading-none">
           <span className="bg-gradient-to-l from-[#6B4EE6] to-[#8B7EF5] bg-clip-text text-lg font-bold text-transparent">
             نبض
           </span>
-          <span className="text-[10px] font-medium text-muted -mt-0.5 tracking-wide">
+          <span className="text-[11px] font-semibold text-slate-400 -mt-0.5">
             الطيبات
           </span>
         </div>
