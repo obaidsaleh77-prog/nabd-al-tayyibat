@@ -9,22 +9,14 @@ export async function POST(req) {
     const userMessage = body.message;
 
     if (!userMessage || typeof userMessage !== 'string') {
-      return NextResponse.json(
-        { error: 'الرسالة غير صحيحة أو فارغة' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'الرسالة فارغة أو غير صحيحة' }, { status: 400 });
     }
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      console.error('❌ OPENROUTER_API_KEY is missing');
-      return NextResponse.json(
-        { error: 'مفتاح API غير موجود في الخادم' },
-        { status: 500 }
-      );
+      console.error('❌ Missing OPENROUTER_API_KEY');
+      return NextResponse.json({ error: 'مفتاح الخادم مفقود' }, { status: 500 });
     }
-
-    console.log('🚀 Calling OpenRouter API...');
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -36,46 +28,27 @@ export async function POST(req) {
       body: JSON.stringify({
         model: 'qwen/qwen-2.5-7b-instruct:free',
         messages: [
-          {
-            role: 'system',
-            content: 'أنت مساعد صحي وغذائي متخصص في تطبيق نبض الطيبات. أجب بدقة ووضوح باللغة العربية.'
-          },
-          {
-            role: 'user',
-            content: userMessage
-          }
+          { role: 'system', content: 'أنت مساعد صحي وغذائي في تطبيق نبض الطيبات. أجب بدقة ووضوح.' },
+          { role: 'user', content: userMessage }
         ],
         max_tokens: 800,
         temperature: 0.7
       })
     });
 
-    console.log('📡 Response status:', response.status);
-
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ OpenRouter Error:', response.status, errorText);
-      return NextResponse.json(
-        { error: `فشل الاتصال بالذكاء الاصطناعي (${response.status})` },
-        { status: response.status }
-      );
+      const errText = await response.text();
+      console.error('OpenRouter Error:', response.status, errText);
+      return NextResponse.json({ error: 'فشل الاتصال بالذكاء الاصطناعي' }, { status: response.status });
     }
 
     const data = await response.json();
-    console.log('✅ Success:', data);
+    const answer = data.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من الإجابة.';
 
-    const answer = data.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من توليد إجابة.';
-
-    return NextResponse.json({
-      reply: answer,
-      success: true
-    });
+    return NextResponse.json({ reply: answer, success: true });
 
   } catch (error) {
-    console.error('💥 Server Error:', error);
-    return NextResponse.json(
-      { error: 'حدث خطأ داخلي في المعالج: ' + error.message },
-      { status: 500 }
-    );
+    console.error('💥 Server Crash:', error);
+    return NextResponse.json({ error: 'خطأ داخلي في الخادم' }, { status: 500 });
   }
 }
