@@ -59,7 +59,7 @@ export default async function AiChatPage() {
           مساعد متخصص بنظام الطيبات فقط — لا تشخيص طبي ولا أدوية
         </p>
       </div>
-      <ChatInterface initialMessages={messages} initialSessionId={sessionId} />
+      <ChatInterface initialMessages={messages} />
     </div>
   );
 }
