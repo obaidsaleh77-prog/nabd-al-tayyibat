@@ -9,25 +9,22 @@ export async function POST(req) {
     const userMessage = body.message;
 
     if (!userMessage) {
-      return NextResponse.json(
-        { error: 'الرسالة فارغة' }, 
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'الرسالة فارغة' }, { status: 400 });
     }
 
-    // الاتصال بـ Puter API
-    const response = await fetch('https://api.puter.com/ai/chat', {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'Origin': 'https://puter.com'
+        'HTTP-Referer': 'https://nabd-al-tayyibat.vercel.app',
       },
       body: JSON.stringify({
-        model: 'qwen',
+        model: 'qwen/qwen-2.5-7b-instruct:free',
         messages: [
           { 
             role: 'system', 
-            content: 'أنت مساعد مفيد في تطبيق نبض الطيبات.' 
+            content: 'أنت مساعد مفيد في تطبيق نبض الطيبات للإجابة على الأسئلة الصحية والغذائية.' 
           },
           { 
             role: 'user', 
@@ -39,46 +36,23 @@ export async function POST(req) {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Puter API Error:', response.status, errorText);
-      
-      if (response.status === 429) {
-        return NextResponse.json(
-          { error: 'تم تجاوز الحد المسموح. انتظر قليلاً.' }, 
-          { status: 429 }
-        );
-      }
-      
+      const errorData = await response.json();
+      console.error('OpenRouter Error:', errorData);
       return NextResponse.json(
-        { error: `خطأ في API: ${response.status}` }, 
-        { status: 500 }
+        { error: 'فشل الاتصال بالذكاء الاصطناعي' }, 
+        { status: response.status }
       );
     }
 
     const data = await response.json();
-    
-    // استخراج الإجابة
-    const answer = data.message?.content || 
-                   data.choices?.[0]?.message?.content ||
-                   'عذراً، لم أتمكن من فهم الرد';
+    const answer = data.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من الإجابة';
 
-    return NextResponse.json({ 
-      reply: answer,
-      success: true 
-    });
+    return NextResponse.json({ reply: answer, success: true });
 
   } catch (error) {
-    console.error('❌ Server Error Details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
-    
+    console.error('Server Error:', error);
     return NextResponse.json(
-      { 
-        error: 'حدث خطأ داخلي في الخادم',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      }, 
+      { error: 'حدث خطأ داخلي' }, 
       { status: 500 }
     );
   }
