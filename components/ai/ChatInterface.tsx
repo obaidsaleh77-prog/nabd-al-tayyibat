@@ -4,19 +4,22 @@ import { useRef, useEffect, useState } from "react";
 import { Send, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import type { ChatMessage } from "@/types/database";
+
+interface ChatMessage {
+  role: "user" | "assistant" | "system";
+  content: string;
+  id?: string;
+}
 
 interface ChatInterfaceProps {
-  initialMessages: ChatMessage[];
-  initialSessionId?: string;
+  initialMessages?: ChatMessage[];
 }
 
 export function ChatInterface({
   initialMessages,
 }: ChatInterfaceProps) {
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages ?? []);
   const [input, setInput] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -24,50 +27,40 @@ export function ChatInterface({
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = async (message: string) => {
-    const res = await fetch("/api/ai-chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "فشل الاتصال");
-    return data.reply;
-  };
-
   const handleSend = async () => {
     if (!input.trim() || input.length > 2000 || loading) return;
 
     const userMsg = input.trim();
     setInput("");
-    setError(null);
-
-    const tempUser: ChatMessage = {
-      id: `user-${Date.now()}`,
-      session_id: "",
-      user_id: "",
-      role: "user",
-      content: userMsg,
-      created_at: new Date().toISOString(),
-    };
-    setMessages((m) => [...m, tempUser]);
+    setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
 
     setLoading(true);
     try {
-      const reply = await sendMessage(userMsg);
-      setMessages((m) => [
-        ...m,
-        {
-          id: `ai-${Date.now()}`,
-          session_id: "",
-          user_id: "",
-          role: "assistant",
-          content: reply,
-          created_at: new Date().toISOString(),
-        },
-      ]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "حدث خطأ غير متوقع");
+      const response = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMsg }),
+      });
+
+      if (!response) {
+        throw new Error("لم يتم استلام رد من الخادم");
+      }
+
+      const data = await response.json();
+
+      if (!data) {
+        throw new Error("البيانات المستلمة فارغة");
+      }
+
+      if (response.ok && data.reply) {
+        setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+      } else {
+        const errorMessage = data?.error || "حدث خطأ غير متوقع";
+        setMessages((prev) => [...prev, { role: "system", content: `عذراً، ${errorMessage}` }]);
+      }
+    } catch (error) {
+      console.error("Chat Error:", error);
+      setMessages((prev) => [...prev, { role: "system", content: "عذراً، حدث خطأ في الاتصال. حاول مرة أخرى." }]);
     } finally {
       setLoading(false);
     }
@@ -75,7 +68,6 @@ export function ChatInterface({
 
   const handleClear = () => {
     setMessages([]);
-    setError(null);
   };
 
   return (
@@ -104,14 +96,16 @@ export function ChatInterface({
             اسأل عن المسموح والممنوع، الفترات، أو قواعد النظام
           </p>
         ) : (
-          messages.map((m) => (
+          messages.map((m, i) => (
             <div
-              key={m.id}
-              className={
+              key={m.id ?? i}
+              className={`rounded-lg px-4 py-2 ${
                 m.role === "user"
-                  ? "mr-8 rounded-lg bg-emerald-100 px-4 py-2 dark:bg-emerald-900/40"
-                  : "ml-8 rounded-lg bg-slate-100 px-4 py-2 dark:bg-slate-800"
-              }
+                  ? "mr-8 bg-emerald-100 dark:bg-emerald-900/40"
+                  : m.role === "system"
+                  ? "bg-red-50 text-red-600 dark:bg-red-950/30"
+                  : "ml-8 bg-slate-100 dark:bg-slate-800"
+              }`}
             >
               <p className="whitespace-pre-wrap text-sm">{m.content}</p>
             </div>
@@ -123,7 +117,6 @@ export function ChatInterface({
       {loading ? (
         <p className="text-sm text-primary/70 text-center">جارٍ التحميل...</p>
       ) : null}
-      {error ? <p role="alert" className="text-sm text-red-600">{error}</p> : null}
 
       <div className="flex gap-2 border-t border-slate-200 pt-3 dark:border-slate-700">
         <input
