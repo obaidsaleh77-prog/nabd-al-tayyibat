@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export const maxDuration = 30;
+export const runtime = 'nodejs';
 
 export async function POST(req) {
   try {
@@ -8,36 +9,77 @@ export async function POST(req) {
     const userMessage = body.message;
 
     if (!userMessage) {
-      return NextResponse.json({ error: 'الرسالة فارغة' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'الرسالة فارغة' }, 
+        { status: 400 }
+      );
     }
 
-    const puterResponse = await fetch('https://api.puter.com/ai/chat', {
+    // الاتصال بـ Puter API
+    const response = await fetch('https://api.puter.com/ai/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Origin': 'https://puter.com'
       },
       body: JSON.stringify({
         model: 'qwen',
         messages: [
-          { role: 'system', content: 'أنت مساعد ذكي في تطبيق نبض الطيبات، تجيب بدقة عن الأسئلة الغذائية والصحية.' },
-          { role: 'user', content: userMessage }
-        ]
+          { 
+            role: 'system', 
+            content: 'أنت مساعد مفيد في تطبيق نبض الطيبات.' 
+          },
+          { 
+            role: 'user', 
+            content: userMessage 
+          }
+        ],
+        max_tokens: 1000
       })
     });
 
-    if (!puterResponse.ok) {
-      const errorData = await puterResponse.json();
-      console.error('Puter API Error:', errorData);
-      return NextResponse.json({ error: 'فشل الاتصال بالذكاء الاصطناعي' }, { status: 500 });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Puter API Error:', response.status, errorText);
+      
+      if (response.status === 429) {
+        return NextResponse.json(
+          { error: 'تم تجاوز الحد المسموح. انتظر قليلاً.' }, 
+          { status: 429 }
+        );
+      }
+      
+      return NextResponse.json(
+        { error: `خطأ في API: ${response.status}` }, 
+        { status: 500 }
+      );
     }
 
-    const data = await puterResponse.json();
-    const replyContent = data.message?.content || data.choices?.[0]?.message?.content || JSON.stringify(data);
+    const data = await response.json();
+    
+    // استخراج الإجابة
+    const answer = data.message?.content || 
+                   data.choices?.[0]?.message?.content ||
+                   'عذراً، لم أتمكن من فهم الرد';
 
-    return NextResponse.json({ reply: replyContent });
+    return NextResponse.json({ 
+      reply: answer,
+      success: true 
+    });
 
   } catch (error) {
-    console.error('Internal Server Error:', error);
-    return NextResponse.json({ error: 'حدث خطأ في المعالج الداخلي' }, { status: 500 });
+    console.error('❌ Server Error Details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    
+    return NextResponse.json(
+      { 
+        error: 'حدث خطأ داخلي في الخادم',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      }, 
+      { status: 500 }
+    );
   }
 }
