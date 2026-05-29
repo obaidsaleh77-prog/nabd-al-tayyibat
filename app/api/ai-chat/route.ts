@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export const maxDuration = 30;
 export const runtime = 'nodejs';
 
-export async function POST(req) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const userMessage = body.message;
@@ -14,7 +14,7 @@ export async function POST(req) {
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      console.error('❌ Missing OPENROUTER_API_KEY');
+      console.error('Missing OPENROUTER_API_KEY');
       return NextResponse.json({ error: 'مفتاح الخادم مفقود' }, { status: 500 });
     }
 
@@ -48,7 +48,7 @@ export async function POST(req) {
     return NextResponse.json({ reply: answer, success: true });
 
   } catch (error) {
-    console.error('💥 Server Crash:', error);
+    console.error('Server Crash:', error);
     return NextResponse.json({ error: 'خطأ داخلي في الخادم' }, { status: 500 });
   }
 }
