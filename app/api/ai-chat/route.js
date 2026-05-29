@@ -8,52 +8,47 @@ export async function POST(req) {
     const body = await req.json();
     const userMessage = body.message;
 
-    if (!userMessage) {
-      return NextResponse.json({ error: 'الرسالة فارغة' }, { status: 400 });
+    if (!userMessage || typeof userMessage !== 'string') {
+      return NextResponse.json({ error: 'الرسالة غير صحيحة' }, { status: 400 });
+    }
+
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) {
+      console.error('❌ Missing OPENROUTER_API_KEY');
+      return NextResponse.json({ error: 'مفتاح API غير موجود في الخادم' }, { status: 500 });
     }
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://nabd-al-tayyibat.vercel.app',
       },
       body: JSON.stringify({
         model: 'qwen/qwen-2.5-7b-instruct:free',
         messages: [
-          { 
-            role: 'system', 
-            content: 'أنت مساعد مفيد في تطبيق نبض الطيبات للإجابة على الأسئلة الصحية والغذائية.' 
-          },
-          { 
-            role: 'user', 
-            content: userMessage 
-          }
+          { role: 'system', content: 'أنت مساعد صحي وغذائي متخصص في تطبيق نبض الطيبات. أجب بدقة، بوضوح، وبلغة عربية سليمة.' },
+          { role: 'user', content: userMessage }
         ],
-        max_tokens: 1000
+        max_tokens: 800,
+        temperature: 0.7
       })
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenRouter Error:', errorData);
-      return NextResponse.json(
-        { error: 'فشل الاتصال بالذكاء الاصطناعي' }, 
-        { status: response.status }
-      );
+      const errText = await response.text();
+      console.error('OpenRouter Error:', response.status, errText);
+      return NextResponse.json({ error: `فشل الخادم (${response.status})` }, { status: response.status });
     }
 
     const data = await response.json();
-    const answer = data.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من الإجابة';
+    const answer = data.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من توليد إجابة.';
 
     return NextResponse.json({ reply: answer, success: true });
 
   } catch (error) {
-    console.error('Server Error:', error);
-    return NextResponse.json(
-      { error: 'حدث خطأ داخلي' }, 
-      { status: 500 }
-    );
+    console.error('💥 Server Crash:', error);
+    return NextResponse.json({ error: 'خطأ داخلي في الخادم' }, { status: 500 });
   }
 }
