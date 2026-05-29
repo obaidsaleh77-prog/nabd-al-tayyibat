@@ -17,7 +17,7 @@ export async function POST(req) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'qwen-turbo',
+        model: 'qwen',
         messages: [
           { role: 'system', content: 'أنت مساعد ذكي في تطبيق نبض الطيبات، تجيب بدقة عن الأسئلة الغذائية والصحية.' },
           { role: 'user', content: userMessage }
