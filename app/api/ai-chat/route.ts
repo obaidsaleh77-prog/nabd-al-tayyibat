@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
         'HTTP-Referer': 'https://nabd-al-tayyibat.vercel.app',
       },
       body: JSON.stringify({
-        model: 'qwen/qwen-2.5-7b-instruct:free',
+        model: 'qwen/qwen3-next-80b-a3b-instruct:free',
         messages: [
           { role: 'system', content: 'أنت مساعد صحي وغذائي في تطبيق نبض الطيبات. أجب بدقة ووضوح.' },
           { role: 'user', content: userMessage }
