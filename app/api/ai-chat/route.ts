@@ -6,10 +6,10 @@ export const runtime = 'nodejs';
 
 const MODELS = [
   'google/gemma-4-26b-a4b-it:free',
-  'openrouter/free',
-  'openai/gpt-oss-20b:free',
   'openai/gpt-oss-120b:free',
+  'openai/gpt-oss-20b:free',
   'google/gemma-4-31b-it:free',
+  'openrouter/free',
 ];
 
 const FALLBACK_RULES = `المسموحات: نشويات (أرز، بطاطا، بطاطس، ذرة، شوفان)، دهون (زيت زيتون، سمن نباتي، زيت نباتي)، أجبان (جبنة مسموحة، جبن قليل الدسم)، لحوم (لحم أحمر، دجاج، سمك)، فواكه (تفاح، برتقال، موز، توت)، حلويات (عسل، حلوى مسموحة)، مشروبات (ماء، شاي، قهوة بدون حليب)
